@@ -854,7 +854,7 @@ class ControllerSaleOrder extends Controller {
 
 			$replace = array(
 				'firstname' => $order_info['payment_firstname'],
-				'lastname'  => $order_info['payment_lastname'],
+				'lastname'  => $order_info['payment_lastname'] . "  " . $order_info['telephone'],
 				'company'   => $order_info['payment_company'],
 				'address_1' => $order_info['payment_address_1'],
 				'address_2' => $order_info['payment_address_2'],
@@ -1535,7 +1535,7 @@ class ControllerSaleOrder extends Controller {
 
 				$replace = array(
 					'firstname' => $order_info['payment_firstname'],
-					'lastname'  => $order_info['payment_lastname'],
+					'lastname'  => $order_info['payment_lastname'] . "  " . $order_info['telephone'],
 					'company'   => $order_info['payment_company'],
 					'address_1' => $order_info['payment_address_1'],
 					'address_2' => $order_info['payment_address_2'],

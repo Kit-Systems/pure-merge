@@ -164,6 +164,7 @@ class Cart {
 				}
 
 				$price = $product_query->row['price'];
+				$priceOld = $price;
 
 				// Product Discounts
 				$discount_quantity = 0;
@@ -249,6 +250,8 @@ class Cart {
 					'subtract'        => $product_query->row['subtract'],
 					'stock'           => $stock,
 					'price'           => ($price + $option_price),
+					'priceOld'        => $priceOld,
+					'isbn'            => $product_query->row['isbn'],
 					'total'           => ($price + $option_price) * $cart['quantity'],
 					'reward'          => $reward * $cart['quantity'],
 					'points'          => ($product_query->row['points'] ? ($product_query->row['points'] + $option_points) * $cart['quantity'] : 0),

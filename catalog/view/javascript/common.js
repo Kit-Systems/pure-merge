@@ -23,6 +23,23 @@ function getURLVar(key) {
 }
 
 $(document).ready(function() {
+	$('.vacancy-header').click(function(){
+		$(this).next().slideToggle('normal');
+		if ($(this).hasClass('closed-heading')) {
+			$(this).removeClass('closed-heading').addClass('opened-heading')
+		} else {
+			$(this).removeClass('opened-heading').addClass('closed-heading')
+		}
+	})
+
+	var countryForShipping = 'Казахстан';
+		console.log(countryForShipping);
+	$('#button-guest').click(function(){
+		console.log('1');
+		countryForShipping = $("#input-payment-country option:selected").text();
+		console.log(countryForShipping);
+	});
+
 	// Highlight any found errors
 	$('.text-danger').each(function() {
 		var element = $(this).parent().parent();
@@ -142,9 +159,10 @@ var cart = {
 			url: 'index.php?route=checkout/cart/add',
 			type: 'post',
 			data: 'product_id=' + product_id + '&quantity=' + (typeof(quantity) != 'undefined' ? quantity : 1),
+
 			dataType: 'json',
 			beforeSend: function() {
-				$('#cart > button').button('loading');
+				$('#cart > button').button('loading');console.log(product_id);
 			},
 			complete: function() {
 				$('#cart > button').button('reset');
@@ -160,8 +178,13 @@ var cart = {
 					$('#content').parent().before('<div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> ' + json['success'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
 
 					// Need to set timeout otherwise it wont update the total
-					setTimeout(function () {
+					/*setTimeout(function () {
 						$('#cart > button').html('<span id="cart-total"><i class="fa fa-shopping-cart"></i> ' + json['total'] + '</span>');
+					}, 100);*/
+					var total = json['total'];
+					console.log(total);
+					setTimeout(function () {
+						$('#cart > button').html('<img src="image/cart.svg" style="height: 17px"><span id="cart-total" style="margin-bottom: 0">' + total.replace('Товаров ' , '').replace(/\(.*?\)/g, '') + '</span>');
 					}, 100);
 
 					$('html, body').animate({ scrollTop: 0 }, 'slow');
@@ -188,9 +211,13 @@ var cart = {
 			},
 			success: function(json) {
 				// Need to set timeout otherwise it wont update the total
-				setTimeout(function () {
-					$('#cart > button').html('<span id="cart-total"><i class="fa fa-shopping-cart"></i> ' + json['total'] + '</span>');
-				}, 100);
+					/*setTimeout(function () {
+						$('#cart > button').html('<span id="cart-total"><i class="fa fa-shopping-cart"></i> ' + json['total'] + '</span>');
+					}, 100);*/
+					var total = json['total'];
+					setTimeout(function () {
+						$('#cart > button').html('<img src="image/cart.svg" style="height: 17px"><span id="cart-total" style="margin-bottom: 0">' + total.replace('Товаров ' , '').replace(/\(.*?\)/g, '') + '</span>');
+					}, 100);
 
 				if (getURLVar('route') == 'checkout/cart' || getURLVar('route') == 'checkout/checkout') {
 					location = 'index.php?route=checkout/cart';
@@ -217,9 +244,13 @@ var cart = {
 			},
 			success: function(json) {
 				// Need to set timeout otherwise it wont update the total
-				setTimeout(function () {
-					$('#cart > button').html('<span id="cart-total"><i class="fa fa-shopping-cart"></i> ' + json['total'] + '</span>');
-				}, 100);
+					/*setTimeout(function () {
+						$('#cart > button').html('<span id="cart-total"><i class="fa fa-shopping-cart"></i> ' + json['total'] + '</span>');
+					}, 100);*/
+					var total = json['total'];
+					setTimeout(function () {
+						$('#cart > button').html('<img src="image/cart.svg" style="height: 17px"><span id="cart-total" style="margin-bottom: 0">' + total.replace('Товаров ' , '').replace(/\(.*?\)/g, '') + '</span>');
+					}, 100);
 
 				if (getURLVar('route') == 'checkout/cart' || getURLVar('route') == 'checkout/checkout') {
 					location = 'index.php?route=checkout/cart';
@@ -252,9 +283,13 @@ var voucher = {
 			},
 			success: function(json) {
 				// Need to set timeout otherwise it wont update the total
-				setTimeout(function () {
-					$('#cart > button').html('<span id="cart-total"><i class="fa fa-shopping-cart"></i> ' + json['total'] + '</span>');
-				}, 100);
+					/*setTimeout(function () {
+						$('#cart > button').html('<span id="cart-total"><i class="fa fa-shopping-cart"></i> ' + json['total'] + '</span>');
+					}, 100);*/
+					var total = json['total'];
+					setTimeout(function () {
+						$('#cart > button').html('<img src="image/cart.svg" style="height: 17px"><span id="cart-total" style="margin-bottom: 0">' + total.replace('Товаров ' , '').replace(/\(.*?\)/g, '') + '</span>');
+					}, 100);
 
 				if (getURLVar('route') == 'checkout/cart' || getURLVar('route') == 'checkout/checkout') {
 					location = 'index.php?route=checkout/cart';

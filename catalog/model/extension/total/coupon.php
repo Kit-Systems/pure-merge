@@ -98,6 +98,8 @@ class ModelExtensionTotalCoupon extends Model {
 	public function getTotal($total) {
 		if (isset($this->session->data['coupon'])) {
 			$this->load->language('extension/total/coupon', 'coupon');
+			$this->load->model('catalog/product');
+
 
 			$coupon_info = $this->getCoupon($this->session->data['coupon']);
 
@@ -121,6 +123,14 @@ class ModelExtensionTotalCoupon extends Model {
 				}
 
 				foreach ($this->cart->getProducts() as $product) {
+					$product_details = $this->model_catalog_product->getProduct($product['product_id']);
+					if($product_details['special']) {
+					    continue;
+					}
+					if($product_details['isbn'] == 'nocoupon') {
+					    continue;
+					}
+
 					$discount = 0;
 
 					if (!$coupon_info['product']) {
@@ -174,7 +184,8 @@ class ModelExtensionTotalCoupon extends Model {
 						'code'       => 'coupon',
 						'title'      => sprintf($this->language->get('coupon')->get('text_coupon'), $this->session->data['coupon']),
 						'value'      => -$discount_total,
-						'sort_order' => $this->config->get('total_coupon_sort_order')
+						'sort_order' => $this->config->get('total_coupon_sort_order'),
+						'discount'   => $coupon_info['discount']
 					);
 
 					$total['total'] -= $discount_total;

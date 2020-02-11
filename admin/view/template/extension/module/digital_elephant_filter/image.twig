@@ -1,0 +1,31 @@
+{% for package in packages %}
+    <div class="form-group">
+        {% if package.key not in exception_image_for_packages %}
+            <label class="col-sm-1 control-label">{{ package.name }}</label>
+            <div class="col-sm-8">
+                <label class="control-label col-sm-2">{{ entry_image }}</label>
+
+                <div class="col-sm-1">
+                    <input
+                        type="text"
+                        class="form-control"
+                        name="DEF_settings[advance][{{ package.key }}][image][width]"
+                        value="{{ DEF_settings['advance'][package.key]['image']['width'] }}"
+                        placeholder="{{ entry_width }}"
+                        size="3"
+                    />
+                </div>
+                <div class="col-sm-1">
+                    <input
+                        type="text"
+                        class="form-control"
+                        name="DEF_settings[advance][{{ package.key }}][image][height]"
+                        value="{{ DEF_settings['advance'][package.key]['image']['height'] }}"
+                        placeholder="{{ entry_height }}"
+                        size="3"
+                    />
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endfor %}

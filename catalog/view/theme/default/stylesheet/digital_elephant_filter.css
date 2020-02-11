@@ -1,0 +1,125 @@
+#digitalElephantFilter_box {
+    border-radius: 0;
+    position: relative;
+	margin-bottom: 20px;
+}
+
+#digitalElephantFilter_box .box-content {
+    padding: 0 5px;
+}
+
+#digitalElephantFilter_box .filter_element_wrap {
+    margin: 5px 0;
+    border-radius: 0;
+}
+
+#digitalElephantFilter_box .price {
+    border: 0;
+    color: #38B0E3;
+    font-weight:300;
+    width: 60px;
+    min-width: 60px;
+    text-align:center;
+}
+
+#digitalElephantFilter_box a.clear_filter {
+    border-bottom: thin dashed;
+    text-decoration: none;
+    float: right;
+}
+
+#digitalElephantFilter_box .filter_element_title {
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 0;
+}
+
+#digitalElephantFilter_box .filter_element_content {
+    margin: 15px;
+}
+
+#digitalElephantFilter_box input,
+#digitalElephantFilter_box input + img {
+    cursor: pointer;
+}
+
+#digitalElephantFilter_box .filter_type_image img {
+    margin: 1px;
+}
+
+#digitalElephantFilter_box .filter_type_image input[type="checkbox"]:checked + img,
+#digitalElephantFilter_box .filter_type_image input[type="radio"]:checked + img
+{
+    border: 1px solid #cecece;
+    margin: 0;
+}
+
+#digitalElephantFilter_box .digitalElephantFilter_type_radio label,
+#digitalElephantFilter_box .digitalElephantFilter_type_checkbox label {
+    width: 100%;
+}
+
+.checkbox-inline+.checkbox-inline,
+.radio-inline+.radio-inline {
+    margin-left: 0;
+}
+
+#digitalElephantFilter_box .digitalElephantFilter_btn td {
+    padding: 5px;
+}
+
+#digitalElephantFilter_box input.btn {
+    width: 100%;
+}
+
+.hold-on {
+    background: rgba(255, 255, 255, 0.4);
+    width: 100%;
+    display: block;
+    position: absolute;
+    z-index: 10;
+	top: 0;
+}
+
+#preloader-container-products {
+    position: absolute;
+    width: 100%;
+	top: 0;
+}
+
+#preloader-container-products > div {
+    width: 30px;
+    margin: auto;
+    position: relative;
+    display: block;
+    margin-top: 20px;
+}
+
+#preloader-container-products > div > i {
+    font-size: 30px;
+    position: absolute;
+    z-index: 100;
+    bottom: -30px;
+}
+
+#digitalElephantFilter_box input:disabled {
+    cursor: default;
+}
+
+#digitalElephantFilter_box input:disabled + span {
+    cursor: default;
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=70)";
+    filter: alpha(opacity=70);
+    -moz-opacity: 0.7;
+    -khtml-opacity: 0.7;
+    opacity: 0.7;
+}
+
+#digitalElephantFilter_box input:disabled + img {
+    cursor: default;
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=30)";
+    filter: alpha(opacity=30);
+    -moz-opacity: 0.3;
+    -khtml-opacity: 0.3;
+    opacity: 0.3;
+}

@@ -95,6 +95,8 @@ class ModelCatalogProduct extends Model {
 
 				$sql .= " AND pf.filter_id IN (" . implode(',', $implode) . ")";
 			}
+
+
 		}
 
 		if (!empty($data['filter_name']) || !empty($data['filter_tag'])) {
@@ -153,6 +155,8 @@ class ModelCatalogProduct extends Model {
 			$sql .= " AND p.manufacturer_id = '" . (int)$data['filter_manufacturer_id'] . "'";
 		}
 
+		$sql .= "AND p2c.category_id <> 2009";
+
 		$sql .= " GROUP BY p.product_id";
 
 		$sort_data = array(
@@ -174,7 +178,7 @@ class ModelCatalogProduct extends Model {
 				$sql .= " ORDER BY " . $data['sort'];
 			}
 		} else {
-			$sql .= " ORDER BY p.sort_order";
+			$sql .= " ORDER BY p.model";
 		}
 
 		if (isset($data['order']) && ($data['order'] == 'DESC')) {
@@ -203,6 +207,12 @@ class ModelCatalogProduct extends Model {
 			$product_data[$result['product_id']] = $this->getProduct($result['product_id']);
 		}
 
+		/*shuffle($product_data);
+		if (shuffle($product_data)) {
+			echo "true";
+		} else {
+			echo "false";
+		}*/
 		return $product_data;
 	}
 

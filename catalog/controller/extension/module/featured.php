@@ -59,6 +59,8 @@ class ControllerExtensionModuleFeatured extends Controller {
 						'special'     => $special,
 						'tax'         => $tax,
 						'rating'      => $rating,
+						'stock'       => $product_info['quantity'],
+						'attribute_groups' => $this->model_catalog_product->getProductAttributes($product_info['product_id']),
 						'href'        => $this->url->link('product/product', 'product_id=' . $product_info['product_id'])
 					);
 				}

@@ -2,6 +2,7 @@
 class ControllerCheckoutCart extends Controller {
 	public function index() {
 		$this->load->language('checkout/cart');
+		$this->load->model('catalog/product');
 
 		$this->document->setTitle($this->language->get('heading_title'));
 
@@ -100,12 +101,16 @@ class ControllerCheckoutCart extends Controller {
 				// Display prices
 				if ($this->customer->isLogged() || !$this->config->get('config_customer_price')) {
 					$unit_price = $this->tax->calculate($product['price'], $product['tax_class_id'], $this->config->get('config_tax'));
-					
+					$unit_price_old = $this->tax->calculate($product['priceOld'], $product['tax_class_id'], $this->config->get('config_tax'));
+
 					$price = $this->currency->format($unit_price, $this->session->data['currency']);
 					$total = $this->currency->format($unit_price * $product['quantity'], $this->session->data['currency']);
+					$priceOld = $this->currency->format($unit_price_old, $this->session->data['currency']);
+
 				} else {
 					$price = false;
 					$total = false;
+					$priceOld = false;
 				}
 
 				$recurring = '';
@@ -141,7 +146,10 @@ class ControllerCheckoutCart extends Controller {
 					'stock'     => $product['stock'] ? true : !(!$this->config->get('config_stock_checkout') || $this->config->get('config_stock_warning')),
 					'reward'    => ($product['reward'] ? sprintf($this->language->get('text_points'), $product['reward']) : ''),
 					'price'     => $price,
+					'priceOld'  => $priceOld,
 					'total'     => $total,
+					'isbn'      => $product['isbn'],
+					//'isbn'      => '11111',
 					'href'      => $this->url->link('product/product', 'product_id=' . $product['product_id'])
 				);
 			}
@@ -207,10 +215,19 @@ class ControllerCheckoutCart extends Controller {
 			$data['totals'] = array();
 
 			foreach ($totals as $total) {
-				$data['totals'][] = array(
-					'title' => $total['title'],
-					'text'  => $this->currency->format($total['value'], $this->session->data['currency'])
-				);
+				if (strpos($total['title'], 'Купон') !== false) {
+					$data['totals'][] = array(
+						'title' => $total['title'],
+						'text'  => $this->currency->format($total['value'], $this->session->data['currency']),
+						'discount' => $total['discount']
+					);
+				} else {
+					$data['totals'][] = array(
+						'title' => $total['title'],
+						'text'  => $this->currency->format($total['value'], $this->session->data['currency'])
+					);
+				}
+				
 			}
 
 			$data['continue'] = $this->url->link('common/home');
@@ -261,7 +278,6 @@ class ControllerCheckoutCart extends Controller {
 
 	public function add() {
 		$this->load->language('checkout/cart');
-
 		$json = array();
 
 		if (isset($this->request->post['product_id'])) {
@@ -317,7 +333,6 @@ class ControllerCheckoutCart extends Controller {
 
 			if (!$json) {
 				$this->cart->add($this->request->post['product_id'], $quantity, $option, $recurring_id);
-
 				$json['success'] = sprintf($this->language->get('text_success'), $this->url->link('product/product', 'product_id=' . $this->request->post['product_id']), $product_info['name'], $this->url->link('checkout/cart'));
 
 				// Unset all shipping and payment methods

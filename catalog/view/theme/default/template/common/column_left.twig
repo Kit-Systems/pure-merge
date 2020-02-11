@@ -1,7 +1,24 @@
 {% if modules %}
-<aside id="column-left" class="col-sm-3 hidden-xs">
+<div class="filter-column-title filter-column-title-closed"><h3 style="padding-left: 15px;
+    display: inline-block;
+    margin-right: 10px;
+    margin-top: 0px;
+    margin-bottom: 25px;">Фильтр</h3></div>
+<aside id="column-left" class="col-sm-3 filter-column">
   {% for module in modules %}
   {{ module }}
   {% endfor %}
 </aside>
+<script>
+$('.filter-column-title').click(function(){
+  if($(this).hasClass('filter-column-title-opened')){
+    $(this).removeClass('filter-column-title-opened');
+    $(this).addClass('filter-column-title-closed');
+  } else {
+    $(this).removeClass('filter-column-title-closed');
+    $(this).addClass('filter-column-title-opened');
+  }
+  $('.filter-column').slideToggle();
+});
+</script>
 {% endif %}

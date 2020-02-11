@@ -47,6 +47,8 @@ class ControllerCommonFileManager extends Controller {
 			// Get files
 			$files = glob($directory . '/' . $filter_name . '*.{jpg,jpeg,png,gif,JPG,JPEG,PNG,GIF}', GLOB_BRACE);
 
+			array_multisort(array_map('filemtime', $files), SORT_NUMERIC, SORT_DESC, $files);
+
 			if (!$files) {
 				$files = array();
 			}

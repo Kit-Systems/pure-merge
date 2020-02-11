@@ -1,0 +1,29 @@
+{% for package in packages %}
+    <div class="form-group">
+        <label class="col-sm-1 control-label">{{ package.name }}</label>
+        <label class="col-sm-1 control-label">{{ text_sort }}</label>
+
+        <div class="col-sm-1">
+            <select
+                    name="DEF_settings[advance][{{ package.key }}][sort]"
+                    class="form-control"
+            >
+                {% for type_sort in list_types_sort %}
+                    {% set selected = '' %}
+                    {% if DEF_settings['advance'][package.key]['sort'] is defined %}
+                        {% if type_sort.value == DEF_settings['advance'][package.key]['sort'] %}
+                            {% set selected = ' selected="selected"' %}
+                        {% endif %}
+                    {% endif %}
+
+                    <option
+                            value="{{ type_sort.value }}"
+                    {{ selected }}
+                    >
+                    {{ type_sort.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+{% endfor %}

@@ -276,6 +276,15 @@ class ControllerMailOrder extends Controller {
 	}
 	
 	public function edit($order_info, $order_status_id, $comment) {
+		$file = 'log.txt';
+		// Открываем файл для получения существующего содержимого
+		$current = file_get_contents($file);
+		// Добавляем нового человека в файл
+		$current .= "John Smith\n";
+		// Пишем содержимое обратно в файл
+		file_put_contents($file, $current);
+
+
 		$language = new Language($order_info['language_code']);
 		$language->load($order_info['language_code']);
 		$language->load('mail/order_edit');

@@ -8,6 +8,7 @@ class ControllerProductProduct extends Controller {
 		$data['breadcrumbs'] = array();
 
 		$data['breadcrumbs'][] = array(
+			//'text' => $this->language->get('text_home'),
 			'text' => $this->language->get('text_home'),
 			'href' => $this->url->link('common/home')
 		);
@@ -241,6 +242,8 @@ class ControllerProductProduct extends Controller {
 			$data['reward'] = $product_info['reward'];
 			$data['points'] = $product_info['points'];
 			$data['description'] = html_entity_decode($product_info['description'], ENT_QUOTES, 'UTF-8');
+
+			$data['number_stock'] = $product_info['quantity'];
 
 			if ($product_info['quantity'] <= 0) {
 				$data['stock'] = $product_info['stock_status'];
