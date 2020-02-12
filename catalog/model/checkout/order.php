@@ -165,6 +165,33 @@ class ModelCheckoutOrder extends Model {
 				$language_code = $this->config->get('config_language');
 			}
 
+			if(isset($this->session->data['payment_address']) && isset($this->session->data['payment_address']['city']))
+			{
+				$citys = explode('_', $this->session->data['payment_address']['city']);
+				$zone = $this->session->data['payment_address']['zone_id'];
+				require('./avis.php');
+				$shipping_cost = 0;
+				$i2 = 1;
+				foreach($cities as $key => $city)
+				{
+					if($zone == $i2)
+					{
+						$i2 = 0;
+						foreach($city as $key2 => $c)
+						{
+							if($citys == $key2)
+							{
+								$title = $key.' ('.$key2.')';
+								$shipping_cost = $zones[$c];
+								break;
+							}
+						}
+						
+					}
+					$i2++;
+				}
+				$order_query->row['total'] += $shipping_cost;
+			}
 			return array(
 				'order_id'                => $order_query->row['order_id'],
 				'invoice_no'              => $order_query->row['invoice_no'],
@@ -343,8 +370,10 @@ class ModelCheckoutOrder extends Model {
 			// Update the DB with the new statuses
 			$this->db->query("UPDATE `" . DB_PREFIX . "order` SET order_status_id = '" . (int)$order_status_id . "', date_modified = NOW() WHERE order_id = '" . (int)$order_id . "'");
 
-			$this->db->query("INSERT INTO " . DB_PREFIX . "order_history SET order_id = '" . (int)$order_id . "', order_status_id = '" . (int)$order_status_id . "', notify = '" . (int)$notify . "', comment = '" . $this->db->escape($comment) . "', date_added = NOW()");
+			//$this->db->query("INSERT INTO " . DB_PREFIX . "order_history SET order_id = '" . (int)$order_id . "', order_status_id = '" . (int)$order_status_id . "', notify = '" . (int)$notify . "', comment = '" . $this->db->escape($comment) . "', date_added = NOW()");
 
+			$this->db->query("INSERT INTO " . DB_PREFIX . "order_history SET order_id = '" . (int)$order_id . "', order_status_id = '" . (int)$order_status_id . "', notify = '" . (int)$notify . "', comment = '" . $this->db->escape($comment) . "', date_added = NOW()");
+			
 			// If old order status is the processing or complete status but new status is not then commence restock, and remove coupon, voucher and reward history
 			if (in_array($order_info['order_status_id'], array_merge($this->config->get('config_processing_status'), $this->config->get('config_complete_status'))) && !in_array($order_status_id, array_merge($this->config->get('config_processing_status'), $this->config->get('config_complete_status')))) {
 				// Restock

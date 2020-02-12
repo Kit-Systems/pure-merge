@@ -33,7 +33,7 @@ class ControllerCheckoutShippingAddress extends Controller {
 
 		$this->load->model('localisation/country');
 
-		$data['countries'] = $this->model_localisation_country->getCountries();
+		$data['countries'] = array_reverse($this->model_localisation_country->getCountries());
 
 		// Custom Fields
 		$data['custom_fields'] = array();
@@ -61,7 +61,6 @@ class ControllerCheckoutShippingAddress extends Controller {
 		$this->load->language('checkout/checkout');
 		
 		$json = array();
-
 		// Validate if customer is logged in.
 		if (!$this->customer->isLogged()) {
 			$json['redirect'] = $this->url->link('checkout/checkout', '', true);
@@ -95,7 +94,7 @@ class ControllerCheckoutShippingAddress extends Controller {
 				break;
 			}
 		}
-
+		
 		if (!$json) {
 			$this->load->model('account/address');
 			
@@ -108,7 +107,30 @@ class ControllerCheckoutShippingAddress extends Controller {
 
 				if (!$json) {
 					$this->session->data['shipping_address'] = $this->model_account_address->getAddress($this->request->post['address_id']);
-
+					
+					require('./avis.php');
+					$zone = $this->request->post['zone_id'];
+					$i2 = 1;
+					foreach($cities as $key => $city)
+					{
+						if($zone == $i2)
+						{
+							$this->session->data['shipping_address']['zone'] = $key;
+							$this->session->data['shipping_address']['zone_id'] = $zone;
+							foreach($city as $key2 => $c)
+							{
+								if($this->request->post['city'] == $key2)
+								{
+									$this->session->data['shipping_address']['city'] = $key2;
+									break;
+								}
+								
+							}
+							break;
+							
+						}
+						$i2++;
+					}
 					unset($this->session->data['shipping_method']);
 					unset($this->session->data['shipping_methods']);
 				}
@@ -125,7 +147,7 @@ class ControllerCheckoutShippingAddress extends Controller {
 					$json['error']['address_1'] = $this->language->get('error_address_1');
 				}
 
-				if ((utf8_strlen(trim($this->request->post['city'])) < 2) || (utf8_strlen(trim($this->request->post['city'])) > 128)) {
+				if (/*(utf8_strlen(trim($this->request->post['city'])) < 2) ||*/ (utf8_strlen(trim($this->request->post['city'])) > 128)) {
 					$json['error']['city'] = $this->language->get('error_city');
 				}
 
@@ -161,10 +183,35 @@ class ControllerCheckoutShippingAddress extends Controller {
 				}
 
 				if (!$json) {
+					
 					$address_id = $this->model_account_address->addAddress($this->customer->getId(), $this->request->post);
 
 					$this->session->data['shipping_address'] = $this->model_account_address->getAddress($address_id);
+					
+					$zone = $this->request->post['zone_id'];
+					$i2 = 1;
+					require('./avis.php');
 
+					foreach($cities as $key => $city)
+					{
+						if($zone == $i2)
+						{
+							$this->session->data['shipping_address']['zone'] = $key;
+							$this->session->data['shipping_address']['zone_id'] = $zone;
+							foreach($city as $key2 => $c)
+							{
+								if($this->request->post['city'] == $key2)
+								{
+									$this->session->data['shipping_address']['city'] = $key2;
+									break;
+								}
+								
+							}
+							break;
+							
+						}
+						$i2++;
+					}
 					// If no default address ID set we use the last address
 					if (!$this->customer->getAddressId()) {
 						$this->load->model('account/customer');

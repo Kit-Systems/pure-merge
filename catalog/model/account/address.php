@@ -107,6 +107,20 @@ class ModelAccountAddress extends Model {
 				$zone = '';
 				$zone_code = '';
 			}
+			$zone = $result['zone_id'];
+			$i2 = 1;
+			require('./avis.php');
+			foreach($cities as $key => $city)
+			{
+				if($zone == $i2)
+				{
+					$zone = $key;
+					$zone_code = $key;
+					break;
+					
+				}
+				$i2++;
+			}
 
 			$address_data[$result['address_id']] = array(
 				'address_id'     => $result['address_id'],

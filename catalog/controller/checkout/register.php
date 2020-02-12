@@ -70,7 +70,9 @@ class ControllerCheckoutRegister extends Controller {
 		}
 
 		$data['shipping_required'] = $this->cart->hasShipping();
-		
+		require('./avis.php');
+		$data['cities'] = $cities;
+		$data['zones'] = $zones;
 		$this->response->setOutput($this->load->view('checkout/register', $data));
 	}
 
@@ -135,7 +137,7 @@ class ControllerCheckoutRegister extends Controller {
 				$json['error']['address_1'] = $this->language->get('error_address_1');
 			}
 
-			if ((utf8_strlen(trim($this->request->post['city'])) < 2) || (utf8_strlen(trim($this->request->post['city'])) > 128)) {
+			if (/*(utf8_strlen(trim($this->request->post['city'])) < 2) ||*/ (utf8_strlen(trim($this->request->post['city'])) > 128)) {
 				$json['error']['city'] = $this->language->get('error_city');
 			}
 
@@ -205,7 +207,19 @@ class ControllerCheckoutRegister extends Controller {
 
 		if (!$json) {
 			$customer_id = $this->model_account_customer->addCustomer($this->request->post);
-
+					$zone = $this->request->post['zone_id'];
+					$i2 = 1;
+					require('./avis.php');
+					foreach($cities as $key => $city)
+					{
+						if($zone == $i2)
+						{
+							$this->session->data['payment_address']['zone'] = $key;
+							break;
+							
+						}
+						$i2++;
+					}
 			// Default Payment Address
 			$this->load->model('account/address');
 				

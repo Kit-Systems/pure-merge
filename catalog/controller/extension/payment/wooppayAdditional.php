@@ -71,13 +71,102 @@ class ControllerExtensionPaymentwooppayAdditional extends Controller
 						}
 						if ($operation_data->response->records[0]->status == WooppayOperationStatus::OPERATION_STATUS_DONE) {
 							$this->load->model('checkout/order');
-							$this->model_checkout_order->addOrderHistory($this->request->get['order'], $this->config->get('payment_wooppayAdditional_order_success_status_id'));
+
+
+							/* AVIS INTEGRATION */
+							require('./avis.php');
+
+							$order_query = $this->db->query("SELECT *, (SELECT os.name FROM `" . DB_PREFIX . "order_status` os WHERE os.order_status_id = o.order_status_id AND os.language_id = o.language_id) AS order_status FROM `" . DB_PREFIX . "order` o WHERE o.order_id = '" . (int)$this->request->get['order'] . "'");
+							$guid = getGUID($order_query->row['shipping_city']);
+							if(!$guid)
+							{
+								$guid = $default_gorod_guid;
+							}
+							$guidAlm = getGUID('Алматы');
+							$options = array(
+								'login' => 'Web2',
+								'password' => '231642200',
+							);
+							$client1 = new SoapClient('https://tc.avislogistics.kz/workbase/ws/WebServiceRemotePoint.1cws?wsdl', $options);
+							$res = $client1->SozdatAdresnuyuTochku(array('Login' => 'Пьюр Бьюти', 'Password' => 'dc226569-7b5b-4993-b23c-558300c51b19',
+								'AdresnayaTochka' => array(
+						
+								'Naimenovaniye' => 'order_'.$this->request->get['order'],
+								'Kod' => 'AT_' . $this->request->get['order'],
+								'Gorod_GUID' => $guid,
+								'Indeks' => '',
+								'Ulitsa' => $order_query->row['shipping_address_1'],
+								'Dom' => '-',
+								'Korpus' => '',
+								'KvartiraOfis' => '',
+								'Telefony' => $order_query->row['telephone'],
+								'Dopolnitelno' => ''
+						
+							)));
+							$codeAtClient = $res->return->AdresnayaTochka_Kod;
+							$codeAtPure = 'PureBeautyAddressPoint';
+							$resF = $client1->SozdatCWB(array('Login' => 'Пьюр Бьюти', 'Password' => 'dc226569-7b5b-4993-b23c-558300c51b19',
+								'InformatsiyaCWB' => array(
+
+								'NomerCWB_Kliyent' => $order_query->row['order_id'],
+								'VidTarifa_GUID' => 'd63c7d77-8ab3-11e5-80e5-0cc47a30d628',
+								'SkhemaDostavki_GUID' => 'f79e5e89-5e33-11e8-a22f-002590877a24',
+								'Soderzhimoye_GUID' => 'd63c7d7b-8ab3-11e5-80e5-0cc47a30d628',
+								'KolichestvoMest' => 1,
+								'VesObyem' => 0,
+								'VesFakticheskiy' => 1,
+								'NaimenovaniyePoluchatelya' => $order_query->row['payment_firstname'] . ' ' . $order_query->row['payment_lastname'],
+								'KontaktnoyeLitsoPoluchatelya' => $order_query->row['shipping_firstname'] . ' ' . $order_query->row['shipping_lastname'],
+								'AdresPoluchatelya_KodAT' => $codeAtClient,
+								//Заполняется либо KodAT либо все реквизиты адресной точки
+								//AdresPoluchatelya_Predstavleniye
+								//Заполняется либо AdresPoluchatelya_Predstavleniye  либо все реквизиты адресной точки
+								//'AdresPoluchatelya_Gorod_GUID' => $guid,
+								//'AdresPoluchatelya_Indeks' => '',
+								//'AdresPoluchatelya_Ulitsa' => $order_query->row['shipping_address_1'],
+								//'AdresPoluchatelya_Dom' => '',
+								//'AdresPoluchatelya_Korpus' => '',
+								//'AdresPoluchatelya_KvartiraOfis' => '',
+								//'AdresPoluchatelya_Dopolnitelno' => '',
+								//'AdresPoluchatelya_Shirota' => '',
+								//'AdresPoluchatelya_Dolgota' => '',
+
+								'TelefonyPoluchatelya' => $order_query->row['telephone'],
+
+								'AdresOtpravitelya_KodAT' => $codeAtPure,
+								//'AdresOtpravitelya_Gorod_GUID' => $guidAlm,
+								//'AdresOtpravitelya_Indeks' => '050000',
+								//'AdresOtpravitelya_Ulitsa' => 'пр. Назарбаева',
+								//'AdresOtpravitelya_Dom' => '137',
+								//'AdresOtpravitelya_Korpus' => '',
+								//'AdresOtpravitelya_KvartiraOfis' => '',
+								//'AdresOtpravitelya_Dopolnitelno' => '',
+								//'AdresOtpravitelya_Shirota' => '',
+								//'AdresOtpravitelya_Dolgota' => '',
+
+								'TelefonyOtpravitelya' => '+7(707)7770159',
+								'SummaNalozhennogoPlatezha' => '',
+								'OpisaniyeSoderzhimogo' => 'косметика',
+								'SpetsialnyyeInstruktsii' => ''
+
+							)));
+
+							$kod_avis = $resF->return->NomerCWB_Avis;
+							
+							$comment = 'Заказ оплачен через Wooppay. Ваш код avislogistics ('. $kod_avis .')';
+
+							$this->model_checkout_order->addOrderHistory($this->request->get['order'], $this->config->get('payment_wooppayAdditional_order_success_status_id'), $comment, TRUE);
+
+							/* AVIS INTEGRATION END */
+
+
+							/*$this->model_checkout_order->addOrderHistory($this->request->get['order'], $this->config->get('payment_wooppayAdditional_order_success_status_id'));
 							$order = $this->model_checkout_order->getOrder($this->request->get['order']);
 							if ($order['order_status_id'] != $this->config->get('payment_wooppay_order_success_status_id')) {
 								$this->log->write('Did not work out to change order status, order id = ' . $this->request->get['order']);
 							} else {
 								echo json_encode(['data' => 1]);
-							}
+							}*/
 						} else {
 							$this->log->write(sprintf('Wooppay callback : счет не оплачен (%s) order id (%s)', $operation_data->response->records[0]->status,
 								$this->request->get['order']));

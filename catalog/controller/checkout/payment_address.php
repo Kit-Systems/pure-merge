@@ -27,7 +27,7 @@ class ControllerCheckoutPaymentAddress extends Controller {
 
 		$this->load->model('localisation/country');
 
-		$data['countries'] = $this->model_localisation_country->getCountries();
+		$data['countries'] = array_reverse($this->model_localisation_country->getCountries());
 
 		// Custom Fields
 		$data['custom_fields'] = array();
@@ -47,7 +47,9 @@ class ControllerCheckoutPaymentAddress extends Controller {
 		} else {
 			$data['payment_address_custom_field'] = array();
 		}
-
+		require('./avis.php');
+		$data['cities'] = $cities;
+		$data['zones'] = $zones;
 		$this->response->setOutput($this->load->view('checkout/payment_address', $data));
 	}
 
@@ -97,7 +99,29 @@ class ControllerCheckoutPaymentAddress extends Controller {
 
 				if (!$json) {
 					$this->session->data['payment_address'] = $this->model_account_address->getAddress($this->request->post['address_id']);
-
+					$zone = $this->request->post['zone_id'];
+					$i2 = 1;
+					require('./avis.php');
+					foreach($cities as $key => $city)
+					{
+						if($zone == $i2)
+						{
+							$this->session->data['payment_address']['zone'] = $key;
+							$this->session->data['payment_address']['zone_id'] = $zone;
+							foreach($city as $key2 => $c)
+							{
+								if($this->request->post['city'] == $key2)
+								{
+									$this->session->data['shipping_address']['city'] = $key2;
+									break;
+								}
+								
+							}
+							break;
+							
+						}
+						$i2++;
+					}
 					unset($this->session->data['payment_method']);
 					unset($this->session->data['payment_methods']);
 				}
@@ -114,7 +138,7 @@ class ControllerCheckoutPaymentAddress extends Controller {
 					$json['error']['address_1'] = $this->language->get('error_address_1');
 				}
 
-				if ((utf8_strlen($this->request->post['city']) < 2) || (utf8_strlen($this->request->post['city']) > 32)) {
+				if (/*(utf8_strlen($this->request->post['city']) < 2) ||*/ (utf8_strlen($this->request->post['city']) > 32)) {
 					$json['error']['city'] = $this->language->get('error_city');
 				}
 
@@ -150,10 +174,36 @@ class ControllerCheckoutPaymentAddress extends Controller {
 				}
 
 				if (!$json) {
+					
+					
 					$address_id = $this->model_account_address->addAddress($this->customer->getId(), $this->request->post);
 
 					$this->session->data['payment_address'] = $this->model_account_address->getAddress($address_id);
-
+					
+					
+					$zone = $this->request->post['zone_id'];
+					$i2 = 1;
+					require('./avis.php');
+					foreach($cities as $key => $city)
+					{
+						if($zone == $i2)
+						{
+							$this->session->data['payment_address']['zone'] = $key;
+							$this->session->data['payment_address']['zone_id'] = $zone;
+							foreach($city as $key2 => $c)
+							{
+								if($this->request->post['city'] == $key2)
+								{
+									$this->session->data['shipping_address']['city'] = $key2;
+									break;
+								}
+								
+							}
+							break;
+							
+						}
+						$i2++;
+					}
 					// If no default address ID set we use the last address
 					if (!$this->customer->getAddressId()) {
 						$this->load->model('account/customer');

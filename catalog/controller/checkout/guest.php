@@ -136,7 +136,11 @@ class ControllerCheckoutGuest extends Controller {
 		} else {
 			$data['captcha'] = '';
 		}
-		
+
+
+		require('./avis.php');
+		$data['cities'] = $cities;
+		$data['zones'] = $zones;
 		$this->response->setOutput($this->load->view('checkout/guest', $data));
 	}
 
@@ -182,7 +186,7 @@ class ControllerCheckoutGuest extends Controller {
 				$json['error']['address_1'] = $this->language->get('error_address_1');
 			}
 
-			if ((utf8_strlen(trim($this->request->post['city'])) < 2) || (utf8_strlen(trim($this->request->post['city'])) > 128)) {
+			if (/*(utf8_strlen(trim($this->request->post['city'])) < 2) ||*/ (utf8_strlen(trim($this->request->post['city'])) > 128)) {
 				$json['error']['city'] = $this->language->get('error_city');
 			}
 
@@ -198,7 +202,7 @@ class ControllerCheckoutGuest extends Controller {
 				$json['error']['country'] = $this->language->get('error_country');
 			}
 
-			if (!isset($this->request->post['zone_id']) || $this->request->post['zone_id'] == '' || !is_numeric($this->request->post['zone_id'])) {
+			if (!isset($this->request->post['zone_id']) || $this->request->post['zone_id'] == ''/* || !is_numeric($this->request->post['zone_id'])*/) {
 				$json['error']['zone'] = $this->language->get('error_zone');
 			}
 

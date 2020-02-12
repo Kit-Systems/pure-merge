@@ -98,7 +98,8 @@ class ControllerCheckoutCheckout extends Controller {
 	public function country() {
 		$json = array();
 
-		$this->load->model('localisation/country');
+		/* ORIGINAL CODE */
+		/*$this->load->model('localisation/country');
 
 		$country_info = $this->model_localisation_country->getCountry($this->request->get['country_id']);
 
@@ -115,6 +116,95 @@ class ControllerCheckoutCheckout extends Controller {
 				'zone'              => $this->model_localisation_zone->getZonesByCountryId($this->request->get['country_id']),
 				'status'            => $country_info['status']
 			);
+		}*/
+
+		require('./avis.php');
+		$zone = array();
+		$this->load->model('account/address');
+
+		$data['addresses'] = $this->model_account_address->getAddresses();
+		$rev = array_reverse($data['addresses']);
+		$address = array_shift($rev);
+		if(isset($_GET['cities']))
+		{
+			
+			$i = 1;
+			foreach($cities as $key => $city)
+			{
+				if($_GET['cities'] == $i)
+				{
+					$i2 = 0;
+					foreach($city as $key2 => $c)
+					{
+						if($address && $address['city'] == $key2)
+						{
+							$json['selected_city'] = $i2;
+						}
+						else
+						if($_GET['t'] == 'shipping' && isset($this->session->data['shipping_address']) && $this->session->data['shipping_address']['city'] == $key2)
+						{
+							$json['selected_city'] = $i2;
+						}
+						else
+						if($_GET['t'] == 'payment' && isset($this->session->data['shipping_address']) && $this->session->data['payment_address']['city'] == $key2)
+						{
+							$json['selected_city'] = $i2;
+						}
+						$obj = new stdClass();
+						$obj->id = $i2;
+						$obj->name = $key2;
+						$obj->price = $zones[$c];
+						$zone[] = $obj;
+						$i2++;
+					}
+					break;
+					
+				}
+				$i++;
+			}
+			$json['cities'] = $zone;
+			
+		}
+		else
+		{
+			$this->load->model('localisation/country');
+
+			$country_info = $this->model_localisation_country->getCountry($this->request->get['country_id']);
+
+			if ($country_info) {
+				$this->load->model('localisation/zone');
+
+				$json = array(
+					'country_id'        => $country_info['country_id'],
+					'name'              => $country_info['name'],
+					'iso_code_2'        => $country_info['iso_code_2'],
+					'iso_code_3'        => $country_info['iso_code_3'],
+					'address_format'    => $country_info['address_format'],
+					'postcode_required' => $country_info['postcode_required'],
+					'zone'              => $this->model_localisation_zone->getZonesByCountryId($this->request->get['country_id']),
+					'status'            => $country_info['status']
+				);
+				
+				if($this->request->get['country_id'] == 109)
+				{
+					$i = 1;
+					foreach($cities as $key => $city)
+					{
+						
+						$obj = new stdClass();
+						$obj->status = 1;
+						$obj->zone_id = ($i);
+						$obj->name = $key;
+						$obj->country_id = $this->request->get['country_id'];
+						$obj->code = 'AH';
+						$i++;
+						$zone[] = $obj;
+					}
+					$json['zone'] = $zone;
+					
+					
+				}
+			}
 		}
 
 		$this->response->addHeader('Content-Type: application/json');

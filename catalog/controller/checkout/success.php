@@ -92,7 +92,7 @@ class ControllerCheckoutSuccess extends Controller {
 					$dataToCrm .= "Комментарий покупателя: " . $orderData['comment'] ;
 
 
-					//amo
+					/*//amo
 			        //ПРЕДОПРЕДЕЛЯЕМЫЕ ПЕРЕМЕННЫЕ
 			        $responsible_user_id = 7292136; //id ответственного по сделке, контакту, компании
 			        $lead_name = "Заказ №" . $orderData['order_id']; //Название добавляемой сделки
@@ -265,9 +265,7 @@ class ControllerCheckoutSuccess extends Controller {
 					);
 					#Формируем ссылку для запроса
 					$link = 'https://' . $subdomain . '.amocrm.ru/api/v2/notes';
-					/* Нам необходимо инициировать запрос к серверу. Воспользуемся библиотекой cURL (поставляется в составе PHP). Подробнее о
-					работе с этой
-					библиотекой Вы можете прочитать в мануале. */
+					
 					$curl = curl_init(); #Сохраняем дескриптор сеанса cURL
 					#Устанавливаем необходимые опции для сеанса cURL
 					curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
@@ -283,7 +281,6 @@ class ControllerCheckoutSuccess extends Controller {
 					curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
 					$out = curl_exec($curl); #Инициируем запрос к API и сохраняем ответ в переменную
 					$code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-					/* Теперь мы можем обработать ответ, полученный от сервера. Это пример. Вы можете обработать данные своим способом. */
 					$code = (int) $code;
 					$errors = array(
 					    301 => 'Moved permanently',
@@ -306,7 +303,7 @@ class ControllerCheckoutSuccess extends Controller {
 					} catch (Exception $E) {
 					    die('Ошибка: ' . $E->getMessage() . PHP_EOL . 'Код ошибки: ' . $E->getCode());
 					}
-			        //amo
+			        //amo*/
 			    }
 			}
 

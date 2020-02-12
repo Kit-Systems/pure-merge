@@ -22,7 +22,128 @@ function getURLVar(key) {
 	}
 }
 
-$(document).ready(function() {
+$(document).ready(function() {	
+	
+	
+	
+	
+	
+	$(document).on('change', '#input-shipping-zone', function(){
+		
+		console.log('#input-shipping-zone changed');
+		
+		if(!$(this).val()){
+			setTimeout(function(){
+				
+				$('#input-shipping-zone').change();
+				
+				
+			}, 1000);
+			return false;
+		}
+		if($('#input-shipping-country').val() == 109)
+		{
+			console.log('Country - Kazakhstan');
+			var t = 'shipping';
+			$.ajax({
+				url: 'index.php?route=checkout/checkout/country&cities=' + $(this).val() + '&t=' + t,
+				type: 'get',
+				dataType: 'json',
+				beforeSend: function() {
+					
+				},
+				complete: function(data) {
+					console.log('Ajax completed');
+					
+				},
+				success: function(json) {
+					console.log('Ajax succeded');
+					var cities = json.cities;
+					var html = '';
+					for(var i = 0; i < cities.length; i++)
+					{
+						if(json.selected_city == i)
+						{
+							html += '<option selected value="' + cities[i].name + '">' + cities[i].name + '</option>';
+						}
+						else
+						{
+							html += '<option value="' + cities[i].name + '">' + cities[i].name + '</option>';
+						}
+						
+					}
+					$('#input-shipping-city').html(html);
+					
+				},
+				error: function(xhr, ajaxOptions, thrownError) {
+					
+				}
+			});
+			
+			
+			
+		}
+		
+	});
+	$(document).on('change', '#input-payment-zone', function(){
+		
+		
+		
+		if(!$(this).val()){
+			setTimeout(function(){
+				
+				$('#input-payment-zone').change();
+				
+				
+			}, 1000);
+			return false;
+		}
+		if($('#input-payment-country').val() == 109)
+		{
+			var t = 'payment';
+			$.ajax({
+				url: 'index.php?route=checkout/checkout/country&cities=' + $(this).val() + '&t=' + t,
+				type: 'get',
+				dataType: 'json',
+				beforeSend: function() {
+					
+				},
+				complete: function(data) {
+					
+					
+				},
+				success: function(json) {
+					
+					var cities = json.cities;
+					var html = '';
+					for(var i = 0; i < cities.length; i++)
+					{
+						if(json.selected_city == i)
+						{
+							html += '<option selected value="' + cities[i].name + '">' + cities[i].name + '</option>';
+						}
+						else
+						{
+							html += '<option value="' + cities[i].name + '">' + cities[i].name + '</option>';
+						}
+						
+					}
+					$('#input-payment-city').html(html);
+					
+				},
+				error: function(xhr, ajaxOptions, thrownError) {
+					
+				}
+			});
+			
+			
+			
+		}
+		
+	});
+	
+
+	$('#input-payment-zone, #input-shipping-zone').change();
 	$('.vacancy-header').click(function(){
 		$(this).next().slideToggle('normal');
 		if ($(this).hasClass('closed-heading')) {

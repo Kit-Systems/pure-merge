@@ -21,7 +21,30 @@ class ModelAccountOrder extends Model {
 			} else {
 				$payment_zone_code = '';
 			}
-
+					$zone = $order_query->row['shipping_zone_id'];
+					$i2 = 1;
+					require('./avis.php');
+					foreach($cities as $key => $city)
+					{
+						if($zone == $i2)
+						{
+							$order_query->row['shipping_zone'] = $key;
+							break;
+						}
+						$i2++;
+					}
+					
+					$zone = $order_query->row['payment_zone_id'];
+					$i2 = 1;
+					foreach($cities as $key => $city)
+					{
+						if($zone == $i2)
+						{
+							$order_query->row['payment_zone'] = $key;
+							break;
+						}
+						$i2++;
+					}
 			$country_query = $this->db->query("SELECT * FROM `" . DB_PREFIX . "country` WHERE country_id = '" . (int)$order_query->row['shipping_country_id'] . "'");
 
 			if ($country_query->num_rows) {

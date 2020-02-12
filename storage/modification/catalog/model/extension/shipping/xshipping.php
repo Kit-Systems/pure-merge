@@ -52,12 +52,59 @@ class ModelExtensionShippingXshipping extends Model {
                  $status = false;
               }
             }
+
+				$citys = $this->session->data['shipping_address']['city'];
+				$zone = $this->session->data['shipping_address']['zone_id'];
+				
+				$i2 = 1;
+				$title = '';
+				
+				if(!isset($cities))
+				{
+					require('./avis.php');
+				}
+				foreach($cities as $key => $city)
+				{
+					if($zone == $i2)
+					{
+						$i2 = 0;
+						foreach($city as $key2 => $c)
+						{
+							if($citys == $key2)
+							{
+								$title = $key.' ('.$key2.')';
+								$shipping_cost = $zones[$c];
+								break;
+							}
+						}
+						
+					}
+					$i2++;
+				}
+				
+				//$status = true;
+			//	echo '<pre>';
+				//print_r($this->session->data['payment_address']);
+				//echo '</pre>';
+				//exit;
+				//print_r($cities[$zone]);
+
+				//$shipping_cost = $zones[$cities[$zone][$city]];
+				if ($this->cart->getSubTotal() >= $free_shipping_cost && $free_shipping_cost!=0) {
+					$shipping_cost = 0;
+				}
+
+            if (get_class($this)!='ModelExtensionShippingFree') {
+              if (($this->config->get('shipping_free_status') == 1) && (float)$this->cart->getTotal() >= $this->config->get('shipping_free_total')) {
+                 $status = false;
+              }
+            }
             
 				if ($status) {
 				
 					$quote_data['xshipping'.$i] = array(
 						'code'         => 'xshipping'.'.xshipping'.$i,
-						'title'        => $shipping_xshipping_methods['name'.$i],
+						'title'        => 'Доставка по "'.$title.'"',//$shipping_xshipping_methods['name'.$i],
 						'cost'         => $shipping_cost,
 						'tax_class_id' => $shipping_xshipping_methods['tax_class_id'.$i],
 						'sort_order'   => intval($shipping_xshipping_methods['sort_order'.$i]),

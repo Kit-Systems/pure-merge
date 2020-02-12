@@ -98,6 +98,41 @@ class ControllerCheckoutConfirm extends Controller {
 
 			$order_data['totals'] = $totals;
 
+			$sub_total = 0;
+			$subtract = 0;
+			$city = $this->session->data['shipping_address']['city'];
+			//echo $city;
+			//exit;
+			$maintotal = 0;
+			foreach ($order_data['totals'] as &$total) {
+				
+				if($total['code'] == 'sub_total')
+				{
+					$sub_total = $total['value'];
+					
+				}
+				if($total['code'] == 'shipping')
+				{
+					if($sub_total > 30000 && ($city == 'Нурсултан' || $city == 'Алматы'))
+					{
+						$subtract = $total['value'];
+						$total['value'] = 0;
+							
+					}
+					
+				}
+				if($total['code'] == 'total')
+				{
+					if($sub_total > 30000 && ($city == 'Нурсултан' || $city == 'Алматы'))
+					{
+						$total['value'] -= $subtract;
+					}
+					
+					$maintotal = $total['value'];
+					
+				}
+			}
+			
 			$this->load->language('checkout/checkout');
 
 			$order_data['invoice_prefix'] = $this->config->get('config_invoice_prefix');
