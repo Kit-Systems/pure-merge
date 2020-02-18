@@ -1,0 +1,1583 @@
+{{ header }}{{ column_left }}
+<div id="content">
+  <div class="page-header">
+    <div class="container-fluid">
+      
+		<!-- / dpd  -->
+		<div class="pull-right">{% if button_dpd %}<button type="button" title="{{ entry_send_to_dpd }}" onclick="sendDpd({{ order_id }}, '');" class="btn btn-danger">Доставка DPD</button>{% endif %} <a href="{{ invoice }}" target="_blank" data-toggle="tooltip" title="{{ button_invoice_print }}" class="btn btn-info"><i class="fa fa-print"></i></a> <a href="{{ shipping }}" target="_blank" data-toggle="tooltip" title="{{ button_shipping_print }}" class="btn btn-info"><i class="fa fa-truck"></i></a> <a href="{{ edit }}" data-toggle="tooltip" title="{{ button_edit }}" class="btn btn-primary"><i class="fa fa-pencil"></i></a> <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a></div>
+		<!-- / dpd  -->
+		
+      <h1>{{ heading_title }}</h1>
+      <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+        <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-4">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title"><i class="fa fa-shopping-cart"></i> {{ text_order_detail }}</h3>
+          </div>
+          <table class="table">
+            <tbody>
+              <tr>
+                <td style="width: 1%;"><button data-toggle="tooltip" title="{{ text_store }}" class="btn btn-info btn-xs"><i class="fa fa-shopping-cart fa-fw"></i></button></td>
+                <td><a href="{{ store_url }}" target="_blank">{{ store_name }}</a></td>
+              </tr>
+              <tr>
+                <td><button data-toggle="tooltip" title="{{ text_date_added }}" class="btn btn-info btn-xs"><i class="fa fa-calendar fa-fw"></i></button></td>
+                <td>{{ date_added }}</td>
+              </tr>
+              <tr>
+                <td><button data-toggle="tooltip" title="{{ text_payment_method }}" class="btn btn-info btn-xs"><i class="fa fa-credit-card fa-fw"></i></button></td>
+                <td>{{ payment_method }}</td>
+              </tr>
+            {% if shipping_method %}
+            <tr>
+              <td><button data-toggle="tooltip" title="{{ text_shipping_method }}" class="btn btn-info btn-xs"><i class="fa fa-truck fa-fw"></i></button></td>
+              <td>{{ shipping_method }}</td>
+            </tr>
+            {% endif %}
+              </tbody>
+            
+          </table>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title"><i class="fa fa-user"></i> {{ text_customer_detail }}</h3>
+          </div>
+          <table class="table">
+            <tr>
+              <td style="width: 1%;"><button data-toggle="tooltip" title="{{ text_customer }}" class="btn btn-info btn-xs"><i class="fa fa-user fa-fw"></i></button></td>
+              <td>{% if customer %} <a href="{{ customer }}" target="_blank">{{ firstname }} {{ lastname }}</a> {% else %}
+                {{ firstname }} {{ lastname }}
+                {% endif %}</td>
+            </tr>
+            <tr>
+              <td><button data-toggle="tooltip" title="{{ text_customer_group }}" class="btn btn-info btn-xs"><i class="fa fa-group fa-fw"></i></button></td>
+              <td>{{ customer_group }}</td>
+            </tr>
+            <tr>
+              <td><button data-toggle="tooltip" title="{{ text_email }}" class="btn btn-info btn-xs"><i class="fa fa-envelope-o fa-fw"></i></button></td>
+              <td><a href="mailto:{{ email }}">{{ email }}</a></td>
+            </tr>
+            <tr>
+              <td><button data-toggle="tooltip" title="{{ text_telephone }}" class="btn btn-info btn-xs"><i class="fa fa-phone fa-fw"></i></button></td>
+              <td>{{ telephone }}</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title"><i class="fa fa-cog"></i> {{ text_option }}</h3>
+          </div>
+          <table class="table">
+            <tbody>
+              <tr>
+                <td>{{ text_invoice }}</td>
+                <td id="invoice" class="text-right">{{ invoice_no }}</td>
+                <td style="width: 1%;" class="text-center">{% if not invoice_no %}
+                  <button id="button-invoice" data-loading-text="{{ text_loading }}" data-toggle="tooltip" title="{{ button_generate }}" class="btn btn-success btn-xs"><i class="fa fa-cog"></i></button>
+                  {% else %}
+                  <button disabled="disabled" class="btn btn-success btn-xs"><i class="fa fa-refresh"></i></button>
+                  {% endif %}</td>
+              </tr>
+              <tr>
+                <td>{{ text_reward }}</td>
+                <td class="text-right">{{ reward }}</td>
+                <td class="text-center">{% if customer and reward %}
+                  {% if not reward_total %}
+                  <button id="button-reward-add" data-loading-text="{{ text_loading }}" data-toggle="tooltip" title="{{ button_reward_add }}" class="btn btn-success btn-xs"><i class="fa fa-plus-circle"></i></button>
+                  {% else %}
+                  <button id="button-reward-remove" data-loading-text="{{ text_loading }}" data-toggle="tooltip" title="{{ button_reward_remove }}" class="btn btn-danger btn-xs"><i class="fa fa-minus-circle"></i></button>
+                  {% endif %}
+                  {% else %}
+                  <button disabled="disabled" class="btn btn-success btn-xs"><i class="fa fa-plus-circle"></i></button>
+                  {% endif %}</td>
+              </tr>
+              <tr>
+                <td>{{ text_affiliate }}
+                  {% if affiliate %}
+                  (<a href="{{ affiliate }}">{{ affiliate_firstname }} {{ affiliate_lastname }}</a>)
+                  {% endif %}</td>
+                <td class="text-right">{{ commission }}</td>
+                <td class="text-center">{% if affiliate %}
+                  {% if not commission_total %}
+                  <button id="button-commission-add" data-loading-text="{{ text_loading }}" data-toggle="tooltip" title="{{ button_commission_add }}" class="btn btn-success btn-xs"><i class="fa fa-plus-circle"></i></button>
+                  {% else %}
+                  <button id="button-commission-remove" data-loading-text="{{ text_loading }}" data-toggle="tooltip" title="{{ button_commission_remove }}" class="btn btn-danger btn-xs"><i class="fa fa-minus-circle"></i></button>
+                  {% endif %}
+                  {% else %}
+                  <button disabled="disabled" class="btn btn-success btn-xs"><i class="fa fa-plus-circle"></i></button>
+                  {% endif %}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-info-circle"></i> {{ text_order }}</h3>
+      </div>
+      <div class="panel-body">
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <td style="width: 50%;" class="text-left">{{ text_payment_address }}</td>
+              {% if shipping_method %}
+              <td style="width: 50%;" class="text-left">{{ text_shipping_address }}</td>
+              {% endif %} </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-left">{{ payment_address }}</td>
+              {% if shipping_method %}
+              <td class="text-left">{{ shipping_address }}</td>
+              {% endif %} </tr>
+          </tbody>
+        </table>
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <td class="text-left">{{ column_product }}</td>
+              <td class="text-left">{{ column_model }}</td>
+              <td class="text-right">{{ column_quantity }}</td>
+              <td class="text-right">{{ column_price }}</td>
+              <td class="text-right">{{ column_total }}</td>
+            </tr>
+          </thead>
+          <tbody>
+          
+          {% for product in products %}
+          <tr>
+            <td class="text-left"><a href="{{ product.href }}">{{ product.name }}</a> {% for option in product.option %} <br />
+              {% if option.type != 'file' %}
+              &nbsp;<small> - {{ option.name }}: {{ option.value }}</small> {% else %}
+              &nbsp;<small> - {{ option.name }}: <a href="{{ option.href }}">{{ option.value }}</a></small> {% endif %}
+              {% endfor %}</td>
+            <td class="text-left">{{ product.model }}</td>
+            <td class="text-right">{{ product.quantity }}</td>
+            <td class="text-right">{{ product.price }}</td>
+            <td class="text-right">{{ product.total }}</td>
+          </tr>
+          {% endfor %}
+          {% for voucher in vouchers %}
+          <tr>
+            <td class="text-left"><a href="{{ voucher.href }}">{{ voucher.description }}</a></td>
+            <td class="text-left"></td>
+            <td class="text-right">1</td>
+            <td class="text-right">{{ voucher.amount }}</td>
+            <td class="text-right">{{ voucher.amount }}</td>
+          </tr>
+          {% endfor %}
+          {% for total in totals %}
+          <tr>
+            <td colspan="4" class="text-right">{{ total.title }}</td>
+            <td class="text-right">{{ total.text }}</td>
+          </tr>
+          {% endfor %}
+            </tbody>
+          
+        </table>
+        {% if comment %}
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <td>{{ text_comment }}</td>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{{ comment }}</td>
+            </tr>
+          </tbody>
+        </table>
+        {% endif %} </div>
+    </div>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-comment-o"></i> {{ text_history }}</h3>
+      </div>
+      <div class="panel-body">
+        <ul class="nav nav-tabs">
+          <li class="active"><a href="#tab-history" data-toggle="tab">{{ tab_history }}</a></li>
+          <li><a href="#tab-additional" data-toggle="tab">{{ tab_additional }}</a></li>
+          {% for tab in tabs %}
+          <li><a href="#tab-{{ tab.code }}" data-toggle="tab">{{ tab.title }}</a></li>
+          {% endfor %}
+        </ul>
+        <div class="tab-content">
+          <div class="tab-pane active" id="tab-history">
+            <div id="history"></div>
+            <br />
+            <fieldset>
+              <legend>{{ text_history_add }}</legend>
+              <form class="form-horizontal">
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-order-status">{{ entry_order_status }}</label>
+                  <div class="col-sm-10">
+                    <select name="order_status_id" id="input-order-status" class="form-control">
+                      
+                      
+                      {% for order_statuses in order_statuses %}
+                      {% if order_statuses.order_status_id == order_status_id %}
+                      
+                      
+                      <option value="{{ order_statuses.order_status_id }}" selected="selected">{{ order_statuses.name }}</option>
+                      
+                      
+                      {% else %}
+                      
+                      
+                      <option value="{{ order_statuses.order_status_id }}">{{ order_statuses.name }}</option>
+                      
+                      
+                      {% endif %}
+                      {% endfor %}
+                    
+                    
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-override"><span data-toggle="tooltip" title="{{ help_override }}">{{ entry_override }}</span></label>
+                  <div class="col-sm-10">
+                    <div class="checkbox">
+                      <input type="checkbox" name="override" value="1" id="input-override" />
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-notify">{{ entry_notify }}</label>
+                  <div class="col-sm-10">
+                    <div class="checkbox">
+                      <input type="checkbox" name="notify" value="1" id="input-notify" />
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-comment">{{ entry_comment }}</label>
+                  <div class="col-sm-10">
+                    <textarea name="comment" rows="8" id="input-comment" class="form-control"></textarea>
+                  </div>
+                </div>
+              </form>
+            </fieldset>
+            <div class="text-right">
+              <button id="button-history" data-loading-text="{{ text_loading }}" class="btn btn-primary"><i class="fa fa-plus-circle"></i> {{ button_history_add }}</button>
+            </div>
+          </div>
+          <div class="tab-pane" id="tab-additional"> {% if account_custom_fields %}
+            <div class="table-responsive">
+              <table class="table table-bordered">
+                <thead>
+                  <tr>
+                    <td colspan="2">{{ text_account_custom_field }}</td>
+                  </tr>
+                </thead>
+                <tbody>
+                
+                {% for custom_field in account_custom_fields %}
+                <tr>
+                  <td>{{ custom_field.name }}</td>
+                  <td>{{ custom_field.value }}</td>
+                </tr>
+                {% endfor %}
+                  </tbody>
+                
+              </table>
+            </div>
+            {% endif %}
+            {% if payment_custom_fields %}
+            <div class="table-responsive">
+              <table class="table table-bordered">
+                <thead>
+                  <tr>
+                    <td colspan="2">{{ text_payment_custom_field }}</td>
+                  </tr>
+                </thead>
+                <tbody>
+                
+                {% for custom_field in payment_custom_fields %}
+                <tr>
+                  <td>{{ custom_field.name }}</td>
+                  <td>{{ custom_field.value }}</td>
+                </tr>
+                {% endfor %}
+                  </tbody>
+                
+              </table>
+            </div>
+            {% endif %}
+            {% if shipping_method and shipping_custom_fields %}
+            <div class="table-responsive">
+              <table class="table table-bordered">
+                <thead>
+                  <tr>
+                    <td colspan="2">{{ text_shipping_custom_field }}</td>
+                  </tr>
+                </thead>
+                <tbody>
+                
+                {% for custom_field in shipping_custom_fields %}
+                <tr>
+                  <td>{{ custom_field.name }}</td>
+                  <td>{{ custom_field.value }}</td>
+                </tr>
+                {% endfor %}
+                  </tbody>
+                
+              </table>
+            </div>
+            {% endif %}
+            <div class="table-responsive">
+              <table class="table table-bordered">
+                <thead>
+                  <tr>
+                    <td colspan="2">{{ text_browser }}</td>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>{{ text_ip }}</td>
+                    <td>{{ ip }}</td>
+                  </tr>
+                {% if forwarded_ip %}
+                <tr>
+                  <td>{{ text_forwarded_ip }}</td>
+                  <td>{{ forwarded_ip }}</td>
+                </tr>
+                {% endif %}
+                <tr>
+                  <td>{{ text_user_agent }}</td>
+                  <td>{{ user_agent }}</td>
+                </tr>
+                <tr>
+                  <td>{{ text_accept_language }}</td>
+                  <td>{{ accept_language }}</td>
+                </tr>
+                  </tbody>
+                
+              </table>
+            </div>
+          </div>
+          {% for tab in tabs %}
+          <div class="tab-pane" id="tab-{{ tab.code }}">{{ tab.content }}</div>
+          {% endfor %} </div>
+      </div>
+    </div>
+  </div>
+
+		<!-- / dpd  -->
+			<div style="display:none;" id="bubblingG" class="bubblingG">
+				<span id="bubblingG_1">
+				</span>
+				<span id="bubblingG_2">
+				</span>
+				<span id="bubblingG_3">
+				</span>
+			</div>
+		<!-- / dpd  -->
+		
+  <script type="text/javascript"><!--
+
+		<!-- / dpd  -->
+		 $(document).on("input",function(ev){
+		var height = $('#input-height').val();
+		var width = $('#input-width').val();
+		var length = $('#input-length').val();
+		
+		if($(ev.target).attr("name") == 'height'){
+			var volume = $(ev.target).val() * width * length;
+			$("#input-volume-shipment").val(volume/1000000);
+			$("#input-volume-shipment-hidden").val(volume/1000000);
+		}else if($(ev.target).attr("name") == 'width'){
+			var volume = $(ev.target).val() * height * length;
+			$("#input-volume-shipment").val(volume/1000000);
+			$("#input-volume-shipment-hidden").val(volume/1000000);
+		}else if($(ev.target).attr("name") == 'length'){
+			var volume = $(ev.target).val() * width * height;
+			$("#input-volume-shipment").val(volume/1000000);
+			$("#input-volume-shipment-hidden").val(volume/1000000);
+		}
+	});
+	
+	$(document).delegate('#sendOrder', 'click', function() {
+		document.getElementById('bubblingG').style.display = 'block'
+		$.ajax({
+			url: 'index.php?route=sale/order/recalculate&user_token={{ user_token }}',
+			type: 'post',
+			data: $('form').serialize() + "&type=send&order_id={{ order_id }}",
+			dataType: 'json',
+			success: function(json) {
+				document.getElementById('bubblingG').style.display = 'none';
+				
+				if(json.err){
+					if(json.err.order){
+						alert(json.err.order);
+					}
+					
+					if(json.err.send){
+						alert(json.err.send);
+					}
+				}
+				
+				if(json.not){
+					if(json.not.receiver){
+						alert(json.not.receiver);
+					}
+					
+					if(json.not.sender){
+						alert(json.not.sender);
+					}
+					
+					if(json.not.cargo){
+						alert(json.not.cargo);
+					}
+					
+					alert('Внимательно проверьте форму!');
+				}
+			
+				if(!json.not && !json.err){
+					sendDpd('{{ order_id }}', '');
+				}
+			},
+			error: function(xhr, ajaxOptions, thrownError) {
+				alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+			}
+		});
+	});
+	
+	$(document).delegate('#sendInvoice', 'click', function() {
+		document.getElementById('bubblingG').style.display = 'block'
+		$.ajax({
+			url: 'index.php?route=sale/order/recalculate&user_token={{ user_token }}',
+			type: 'post',
+			data: $('form').serialize() + "&invoice=ok&order_id={{ order_id }}",
+			dataType: 'json',
+			success: function(json) {
+				document.getElementById('bubblingG').style.display = 'none';
+				
+				if(json.err_inv){
+					alert(json.err_inv);
+				}else{
+					sendDpd('{{ order_id }}', $('#myModel .active a').attr('id'));
+				}
+				
+			},
+			error: function(xhr, ajaxOptions, thrownError) {
+				alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+			}
+		});
+	});
+	
+	$(document).delegate('#sendLabel', 'click', function() {
+		document.getElementById('bubblingG').style.display = 'block'
+		$.ajax({
+			url: 'index.php?route=sale/order/recalculate&user_token={{ user_token }}',
+			type: 'post',
+			data: $('form').serialize() + "&label=ok&order_id={{ order_id }}",
+			dataType: 'json',
+			success: function(json) {
+				document.getElementById('bubblingG').style.display = 'none';
+				
+				if(json.err_label){
+					alert(json.err_label);
+				}else{
+					sendDpd('{{ order_id }}', $('#myModel .active a').attr('id'));
+				}
+				
+			},
+			error: function(xhr, ajaxOptions, thrownError) {
+				alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+			}
+		});
+	});
+	
+   function sendDpd(order_id, tab) {
+	document.getElementById('bubblingG').style.display = 'block';
+	$.ajax({
+		url: 'index.php?route=sale/order/recalculate&user_token={{ user_token }}',
+		type: 'post',
+		data: $('form').serialize() + "&order_id=" + order_id,
+		dataType: 'json',
+		success: function(json) {
+		    $('#dpd-model').modal('hide');
+			$('#dpd-model').on('shown.bs.hidden', function(e) {
+				$(this).remove();
+			});
+			
+			document.getElementById('bubblingG').style.display = 'none';
+			var dpdModel = '<div class="modal fade bd-example-modal-lg" id="dpd-model" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">';
+			dpdModel+= '	<div class="modal-dialog modal-lg"" role="document">';
+			dpdModel+= '		<div class="modal-content">';
+			dpdModel+= '		  <div class="modal-header">';
+			dpdModel+= '			<button type="button" class="close" data-dismiss="modal" aria-label="Close">';
+			dpdModel+= '			  <span aria-hidden="true">&times;</span>';
+			dpdModel+= '			</button>';
+			dpdModel+= '			<h4 class="modal-title">' + json.text_edit_dpd + '</h4>';
+			dpdModel+= '		  </div>';
+			dpdModel+= '		  <div class="modal-body">';
+									if(json.not){
+										if(json.not.calculate){
+			dpdModel+= '			<div id="alert-error-top" class="alert alert-danger" role="alert"><button type="button" class="close" data-dismiss="alert">&times;</button>';
+			dpdModel+= '				 <p style="color:black;" id="error-top">' + json.not.calculate + '</p>';
+			dpdModel+= '			</div>';
+										}
+									}else{
+			dpdModel+= '			<div id="alert-top" class="alert alert-success" role="alert"><button type="button" class="close" data-dismiss="alert">&times;</button>';
+			dpdModel+= '			  <p style="color:black;" id="delivery-total-top">' + json.price_delivery_top + '</p>';
+			dpdModel+= '			  <p style="color:black;" id="markup-total-top">' + json.price_delivery_markup_top + '</p>';
+			dpdModel+= '			</div>';
+									}
+			dpdModel+= '			<form class="form-horizontal" id="dpd-form">';
+			dpdModel+= '				<ul id="myModel" class="nav nav-tabs">';
+			dpdModel+= '					<li class="active"><a href="#tab-order" id="order" data-toggle="tab">' + json.tab_order + '</a></li>';
+			dpdModel+= '					<li><a href="#tab-sender" id="sender" data-toggle="tab">' + json.tab_sender + '</a></li>';
+			dpdModel+= '					<li><a href="#tab-recipient" id="recipient" data-toggle="tab">' + json.tab_recipient + '</a></li>';
+			dpdModel+= '					<li><a href="#tab-payment" id="payment" data-toggle="tab">' + json.tab_payment + '</a></li>';
+			dpdModel+= '					<li><a href="#tab-option" id="option" data-toggle="tab">' + json.tab_option + '</a></li>';
+			dpdModel+= '					<li><a href="#tab-doc" id="doc" data-toggle="tab">' + json.tab_doc + '</a></li>';
+			dpdModel+= '				</ul>';
+			dpdModel+= '				<div class="tab-content">';
+			dpdModel+= '					<div class="tab-pane active" id="tab-order">';
+			dpdModel+= '					   <div class="form-group">';
+			dpdModel+= '							<label class="col-sm-4 control-label" for="input-status-dpd">' + json.entry_order_dpd_status + '</label>';
+			dpdModel+= '							<div class="col-sm-8">';
+			dpdModel+= '								<p class="form-control-static">' + json.status_dpd + '</p>';
+			dpdModel+= '							</div>';
+			dpdModel+= '					   </div>';
+			dpdModel+= '					   <div class="form-group">';
+			dpdModel+= '							<label class="col-sm-4 control-label" for="input-order-id">' + json.entry_order_id_ocart + '</label>';
+			dpdModel+= '							<div class="col-sm-8">';
+			dpdModel+= '								<p class="form-control-static" id="input-order-id">' + json.dpd_orders.order_id + '</p>';
+			dpdModel+= '							</div>';
+			dpdModel+= '					   </div>';
+			dpdModel+= '					   <div class="form-group">';
+			dpdModel+= '							<label class="col-sm-4 control-label" for="input-dpd-id">' + json.entry_order_id_dpd + '</label>';
+			dpdModel+= '							<div class="col-sm-8">';
+			dpdModel+= '								<p class="form-control-static" id="input-dpd-id">' + json.dpd_orders.dpd_id + '</p>';
+			dpdModel+= '							</div>';
+			dpdModel+= '					   </div>';
+			dpdModel+= '					   <div class="form-group">';
+			dpdModel+= '							<label class="col-sm-4 control-label" for="input-payment-method">' + json.entry_payment_method_delivery + '</label>';
+			dpdModel+= '							<div class="col-sm-5">';
+			dpdModel+= '								<select name="payment_method_delivery" id="input-payment-method" class="form-control">';
+														for (var key in json.payment_method_delivery_arr) {
+															if(json.payment_method_delivery_arr[key].value == json.payment_method_delivery){
+			dpdModel+= '										<option selected="selected" value="' + json.payment_method_delivery_arr[key].value + '">' + json.payment_method_delivery_arr[key].name + '</option>';									
+															}else{
+			dpdModel+= '										<option value="' + json.payment_method_delivery_arr[key].value + '">' + json.payment_method_delivery_arr[key].name + '</option>';
+															}
+														}
+			dpdModel+= '								</select>';
+			dpdModel+= '							</div>';
+			dpdModel+= '						</div>';
+			dpdModel+= '						<div class="form-group">';
+			dpdModel+= '							<label class="col-sm-4 control-label" for="input-delivery-method">' + json.entry_delivery_method + '</label>';
+			dpdModel+= '							<div class="col-sm-5">';
+			dpdModel+= '								<select name="shipping_method" id="input-delivery-method" class="form-control">';
+														for (var key in json.tariffs) {
+															if(json.tariffs[key].value == json.shipping_method){
+			dpdModel+= '										<option selected="selected" value="' + json.tariffs[key].value + '">' + json.tariffs[key].name + '</option>';									
+															}else{
+			dpdModel+= '										<option value="' + json.tariffs[key].value + '">' + json.tariffs[key].name + '</option>';
+															}
+														}
+			dpdModel+= '								</select>';
+			dpdModel+= '							</div>';
+			dpdModel+= '						</div>';
+			dpdModel+= '						<div class="form-group">';
+			dpdModel+= '							<label class="col-sm-4 control-label" for="input-variable-delivery">' + json.entry_variable_delivery + '</label>';
+			dpdModel+= '							<div class="col-sm-5">';
+			dpdModel+= '								<select name="variable_delivery" id="input-variable-delivery" class="form-control">';
+														for (var key in json.variable_delivery_arr) {
+															if(json.variable_delivery_arr[key].value == json.variable_delivery){
+			dpdModel+= '										<option selected="selected" value="' + json.variable_delivery_arr[key].value + '">' + json.variable_delivery_arr[key].name + '</option>';										
+															}else{
+			dpdModel+= '										<option value="' + json.variable_delivery_arr[key].value + '">' + json.variable_delivery_arr[key].name + '</option>';
+															}
+														}
+			dpdModel+= '								</select>';
+			dpdModel+= '							</div>';
+			dpdModel+= '						</div>';
+			dpdModel+= '						<div class="form-group">';
+			dpdModel+= '							<label class="col-sm-4 control-label" for="input-date-shipment">' + json.entry_date_shipment + '</label>';
+			dpdModel+= '							<div class="col-sm-5">';
+			dpdModel+= '								<div class="input-group date">';
+			dpdModel+= '									<input type="text" name="date_shipment" value="' + json.date_shipment + '" id="input-date-shipment" class="form-control" />';
+			dpdModel+= '									<span class="input-group-btn">';
+			dpdModel+= '										<button type="button" class="btn btn-default"><i class="fa fa-calendar"></i></button>';
+			dpdModel+= '									</span>';
+			dpdModel+= '								</div>';
+			dpdModel+= '							</div>';
+			dpdModel+= '						</div>';
+			dpdModel+= '						<div class="form-group">';
+			dpdModel+= '							<label class="col-sm-4 control-label" for="input-transit-interval">' + json.entry_dpd_transit_interval + '</label>';
+			dpdModel+= '							<div class="col-sm-5">';
+			dpdModel+= '								<select name="transit_interval" id="input-transit-interval" class="form-control">';
+														for (var key in json.dpd_transit_interval) {
+															if(json.dpd_transit_interval[key].value == json.transit_interval){
+			dpdModel+= '										<option selected="selected" value="' + json.dpd_transit_interval[key].value + '">' + json.dpd_transit_interval[key].name + '</option>';									
+															}else{
+			dpdModel+= '										<option value="' + json.dpd_transit_interval[key].value + '">' + json.dpd_transit_interval[key].name + '</option>';
+															}
+														}
+			dpdModel+= '								</select>';
+			dpdModel+= '							</div>';
+			dpdModel+= '						</div>';
+			dpdModel+= '						<div class="form-group">';
+			dpdModel+= '							<label class="col-sm-4 control-label" for="input-time-interval">' + json.entry_delivery_time_interval + '</label>';
+			dpdModel+= '							<div class="col-sm-5">';
+			dpdModel+= '								<select name="time_interval" id="input-time-interval" class="form-control">';
+														for (var key in json.delivery_time_interval) {
+															if(json.delivery_time_interval[key].value == json.time_interval){
+			dpdModel+= '										<option selected="selected" value="' + json.delivery_time_interval[key].value + '">' + json.delivery_time_interval[key].name + '</option>';						
+															}else{
+			dpdModel+= '										<option value="' + json.delivery_time_interval[key].value + '">' + json.delivery_time_interval[key].name + '</option>';
+															}
+														}
+			dpdModel+= '								</select>';
+			dpdModel+= '							</div>';
+			dpdModel+= '						</div>';
+			dpdModel+= '						<div class="alert alert-info" align="center" role="alert">' + json.text_detail_order + '</div>';
+			dpdModel+= '						<div class="form-group">';
+			dpdModel+= '							<label class="col-sm-4 control-label" for="input-weight-shipment">' + json.entry_weight_shipment + '</label>';
+			dpdModel+= '							<div class="col-sm-5">';
+			dpdModel+= '								<input type="text" name="weight_shipment" id="input-weight-shipment" value="' + json.weight + '" class="form-control" />';
+			dpdModel+= '							</div>';
+			dpdModel+= '						</div>';
+			dpdModel+= '						<div class="form-group">';
+			dpdModel+= '							<label class="col-sm-4 control-label" for="input-dimensions-shipment">' + json.entry_dimensions_shipment + '</label>';
+			dpdModel+= '							<div class="col-sm-4">';
+			dpdModel+= '								<input type="text" name="height" id="input-height" value="' + json.height + '" class="form-control" style="width: 20%; display: inline;">';
+			dpdModel+= '								&nbsp;x&nbsp;';
+			dpdModel+= '								<input type="text" name="length" id="input-length" value="' + json.length + '" class="form-control" style="width: 20%; display: inline;">';
+			dpdModel+= '								&nbsp;x&nbsp;';
+			dpdModel+= '								<input type="text" name="width" id="input-width" value="' + json.width + '" class="form-control" style="width: 20%; display: inline;">';
+														if(json.not){
+															if(json.not.rec){
+			dpdModel+= '								<div id="error-dimensions" class="text-danger">' + json.not.rec + '</div>';
+															}else if(json.not.send){
+			dpdModel+= '								<div id="error-dimensions" class="text-danger">' + json.not.send + '</div>';
+															}
+														}
+			dpdModel+= '							</div>';
+			dpdModel+= '						</div>';
+			dpdModel+= '						<div class="form-group">';
+			dpdModel+= '							<label class="col-sm-4 control-label" for="input-volume-shipment">' + json.entry_volume_shipment + '</label>';
+			dpdModel+= '							<div class="col-sm-5">';
+			dpdModel+= '								<input type="text" name="volume" disabled id="input-volume-shipment" value="' + json.volume + '" class="form-control" />';
+			dpdModel+= '								<input type="hidden" name="volume" id="input-volume-shipment-hidden" value="' + json.volume + '" class="form-control" />';
+			dpdModel+= '							</div>';
+			dpdModel+= '						</div>';
+			dpdModel+= '						<div class="form-group">';
+			dpdModel+= '							<label class="col-sm-4 control-label" for="input-quantity-places">' + json.entry_quantity_places + '</label>';
+			dpdModel+= '							<div class="col-sm-5">';
+			dpdModel+= '								<input type="text" name="quantity_places" id="input-quantity-places" value="' + json.quantity_places + '" class="form-control" />';
+			dpdModel+= '							</div>';
+			dpdModel+= '						</div>';
+			dpdModel+= '						<div class="form-group">';
+			dpdModel+= '							<label class="col-sm-4 control-label" for="input-content-sender">' + json.entry_content_sender + '</label>';
+			dpdModel+= '							<div class="col-sm-5">';
+			dpdModel+= '								<input type="text" name="content_sender" id="input-content-sender" value="' + json.content_sender + '" class="form-control" />';
+			dpdModel+= '							</div>';
+			dpdModel+= '						</div>';
+			dpdModel+= '					</div>';
+			dpdModel+= '					<div class="tab-pane" id="tab-sender">';
+			dpdModel+= '						<div class="form-group">';
+			dpdModel+= '							<div class="sh-flex">';
+			dpdModel+= '								<label class="col-sm-4 control-label"><span data-toggle="tooltip" title="' + json.help_contact_face + '">' + json.entry_contact_face + '</span></label>';
+			dpdModel+= '								<div class="col-sm-5">';
+			dpdModel+= '									<input type="text" name="contact_face" value="' + json.contact_face + '" class="form-control">';
+			dpdModel+= '								</div>';
+			dpdModel+= '							</div>';
+			dpdModel+= '						</div>';
+			dpdModel+= '						<div class="form-group">';
+			dpdModel+= '							<div class="sh-flex">';
+			dpdModel+= '								<label class="col-sm-4 control-label"><span data-toggle="tooltip" title="' + json.help_name_company + '">' + json.entry_name_company + '</span></label>';
+			dpdModel+= '								<div class="col-sm-5">';
+			dpdModel+= '									<input type="text" name="name_company" value="' + json.name_company + '" class="form-control">';
+			dpdModel+= '								</div>';
+			dpdModel+= '							</div>';
+			dpdModel+= '						</div>';
+			dpdModel+= '						<div class="form-group">';
+			dpdModel+= '							<div class="sh-flex">';
+			dpdModel+= '								<label class="col-sm-4 control-label">' + json.entry_phone_sender + '</label>';
+			dpdModel+= '								<div class="col-sm-5">';
+			dpdModel+= '									<input type="text" name="phone_sender" value="' + json.phone_sender + '" class="form-control">';
+			dpdModel+= '								</div>';
+			dpdModel+= '							</div>';
+			dpdModel+= '						</div>';
+			dpdModel+= '						<div class="form-group">';
+			dpdModel+= '							<div class="sh-flex">';
+			dpdModel+= '								<label class="col-sm-4 control-label">' + json.entry_email_sender + '</label>';
+			dpdModel+= '								<div class="col-sm-5">';
+			dpdModel+= '									<input type="text" name="email_sender" value="' + json.email_sender + '" class="form-control">';
+			dpdModel+= '								</div>';
+			dpdModel+= '							</div>';
+			dpdModel+= '						</div>';
+			dpdModel+= '						<div class="form-group">';
+			dpdModel+= '						<div class="sh-flex">';
+			dpdModel+= '							<label class="col-sm-4 control-label" for="input-pass">' + json.entry_pass + '</label>';
+			dpdModel+= '							<div class="col-sm-4">';
+			dpdModel+= '								<div class="checkbox">';
+			dpdModel+= '									<label>';
+															if(json.pass == '1' || json.pass == 'on'){
+			dpdModel+= '									<input type="checkbox" id="input-pass" name="pass" checked="checked" />';
+															}else{
+			dpdModel+= '									<input type="checkbox" id="input-pass" name="pass" />';
+															}
+			dpdModel+= '									</label>';
+			dpdModel+= '								</div>';
+			dpdModel+= '							</div>';
+			dpdModel+= '						</div>';
+			dpdModel+= '						</div>';
+			dpdModel+= '						<div class="alert alert-info" align="center" role="alert">' + json.entry_h_address + '</div>';
+			dpdModel+= '						<div class="form-group">';
+			dpdModel+= '							<label class="col-sm-4 control-label" for="input-city">' + json.entry_city_sender + '</label>';
+			dpdModel+= '							<div class="col-sm-8">';
+			dpdModel+= '								<p class="form-control-static">' + json.city_sender + '</p>';
+			dpdModel+= '								<input type="hidden" name="city_id_sender" value="' + json.city_id_sender + '" />';
+			dpdModel+= '							</div>';
+			dpdModel+= '					   </div>';
+												if(json.selfpickup == '1'){
+			dpdModel+= '					   <div id="terminal-sender" class="form-group">';
+			dpdModel+= '							<label class="col-sm-4 control-label" for="input-terminal-sender">' + json.entry_terminal_sender + '</label>';
+			dpdModel+= '						    <div class="col-sm-8">';
+			dpdModel+= '								<select name="terminal_sender" id="input-terminal-sender" class="form-control">';
+														for (var key in json.terminal_sender_arr) {
+															if(json.terminal_sender_arr[key].CODE == json.terminal_sender){
+			dpdModel+= '									<option value="' + json.terminal_sender_arr[key].CODE + '" selected="selected">' + json.terminal_sender_arr[key].NAME + '</option>';
+															}else{
+			dpdModel+= '									<option value="' + json.terminal_sender_arr[key].CODE + '">' + json.terminal_sender_arr[key].NAME + '</option>';
+															}
+														}
+			dpdModel+= '								</select>';
+														if(json.not){
+															if(json.not.send){
+			dpdModel+= '								<div id="error-rec-dimensions" class="text-danger">' + json.not.send + '</div>';
+															}
+														}
+			dpdModel+= '							</div>';
+			dpdModel+= '						</div>';
+												}else{
+			dpdModel+= '						<div id="door-sender">';
+			dpdModel+= '						<div class="form-group">';
+			dpdModel+= '							<div class="sh-flex">';
+			dpdModel+= '								<label class="col-sm-4 control-label">' + json.entry_street_sender + '</label>';
+			dpdModel+= '								<div class="col-sm-4">';
+			dpdModel+= '									<input type="text" name="street_sender" value="' + json.street_sender + '" class="form-control">';
+			dpdModel+= '								</div>';
+			dpdModel+= '							</div>';
+			dpdModel+= '						</div>';
+			dpdModel+= '						<div class="form-group">';
+			dpdModel+= '							<div class="sh-flex">';
+			dpdModel+= '								<label class="col-sm-4 control-label"><span data-toggle="tooltip" title="' + json.help_ab_street_sender + '">' + json.entry_ab_street_sender + '</label>';
+			dpdModel+= '								<div class="col-sm-4">';
+			dpdModel+= '									<input type="text" name="ab_street_sender" value="' + json.ab_street_sender + '" class="form-control">';
+			dpdModel+= '								</div>';
+			dpdModel+= '							</div>';
+			dpdModel+= '						</div>';
+			dpdModel+= '						<div class="form-group">';
+			dpdModel+= '							<div class="sh-flex">';
+			dpdModel+= '								<label class="col-sm-4 control-label">' + json.entry_house_sender + '</label>';
+			dpdModel+= '								<div class="col-sm-4">';
+			dpdModel+= '									<input type="text" name="house_sender" value="' + json.house_sender + '" class="form-control">';
+			dpdModel+= '								</div>';
+			dpdModel+= '							</div>';
+			dpdModel+= '						</div>';
+			dpdModel+= '						<div class="form-group">';
+			dpdModel+= '							<div class="sh-flex">';
+			dpdModel+= '								<label class="col-sm-4 control-label">' + json.entry_corp_sender + '</label>';
+			dpdModel+= '								<div class="col-sm-4">';
+			dpdModel+= '									<input type="text" name="corp_sender" value="' + json.corp_sender + '" class="form-control">';
+			dpdModel+= '								</div>';
+			dpdModel+= '							</div>';
+			dpdModel+= '						</div>';
+			dpdModel+= '						<div class="form-group">';
+			dpdModel+= '							<div class="sh-flex">';
+			dpdModel+= '								<label class="col-sm-4 control-label">' + json.entry_structure_sender + '</label>';
+			dpdModel+= '								<div class="col-sm-4">'
+			dpdModel+= '									<input type="text" name="structure_sender" value="' + json.structure_sender + '" class="form-control">';
+			dpdModel+= '								</div>';
+			dpdModel+= '							</div>';
+			dpdModel+= '						</div>';
+			dpdModel+= '						<div class="form-group">';
+			dpdModel+= '							<div class="sh-flex">';
+			dpdModel+= '								<label class="col-sm-4 control-label">' + json.entry_poss_sender + '</label>';
+			dpdModel+= '								<div class="col-sm-4">';
+			dpdModel+= '									<input type="text" name="poss_sender" value="' + json.poss_sender + '" class="form-control">';
+			dpdModel+= '								</div>';
+			dpdModel+= '							</div>';
+			dpdModel+= '						</div>';
+			dpdModel+= '						<div class="form-group">';
+			dpdModel+= '							<div class="sh-flex">';
+			dpdModel+= '								<label class="col-sm-4 control-label">' + json.entry_office_sender + '</label>';
+			dpdModel+= '								<div class="col-sm-4">';
+			dpdModel+= '									<input type="text" name="office_sender" value="' + json.office_sender + '" class="form-control">';
+			dpdModel+= '								</div>';
+			dpdModel+= '							</div>';
+			dpdModel+= '						</div>';
+			dpdModel+= '						<div class="form-group">';
+			dpdModel+= '							<div class="sh-flex">';
+			dpdModel+= '								<label class="col-sm-4 control-label">' + json.entry_apart_sender + '</label>';
+			dpdModel+= '								<div class="col-sm-4">';
+			dpdModel+= '									<input type="text" name="apart_sender" value="' + json.apart_sender + '" class="form-control">';
+			dpdModel+= '								</div>';
+			dpdModel+= '							</div>';
+			dpdModel+= '						</div>';
+			dpdModel+= '						</div>';
+												}
+			dpdModel+= '					</div>';
+			dpdModel+= '					<div class="tab-pane" id="tab-recipient">';
+			dpdModel+= '						<div class="form-group">';
+			dpdModel+= '							<div class="sh-flex">';
+			dpdModel+= '								<label class="col-sm-4 control-label">' + json.entry_contact_face + '</label>';
+			dpdModel+= '								<div class="col-sm-5">';
+			dpdModel+= '									<input type="text" name="contact_face_rec" value="' + json.contact_face_rec + '" class="form-control">';
+			dpdModel+= '								</div>';
+			dpdModel+= '							</div>';
+			dpdModel+= '						</div>';
+			dpdModel+= '						<div class="form-group">';
+			dpdModel+= '							<div class="sh-flex">';
+			dpdModel+= '								<label class="col-sm-4 control-label">' + json.entry_name_company + '</label>';
+			dpdModel+= '								<div class="col-sm-5">';
+			dpdModel+= '									<input type="text" name="name_company_rec" value="' + json.name_company_rec + '" class="form-control">';
+			dpdModel+= '								</div>';
+			dpdModel+= '							</div>';
+			dpdModel+= '						</div>';
+			dpdModel+= '						<div class="form-group">';
+			dpdModel+= '							<div class="sh-flex">';
+			dpdModel+= '								<label class="col-sm-4 control-label">' + json.entry_phone_sender + '</label>';
+			dpdModel+= '								<div class="col-sm-5">';
+			dpdModel+= '									<input type="text" name="phone_rec" value="' + json.phone_rec + '" class="form-control">';
+			dpdModel+= '								</div>';
+			dpdModel+= '							</div>';
+			dpdModel+= '						</div>';
+			dpdModel+= '						<div class="form-group">';
+			dpdModel+= '							<div class="sh-flex">';
+			dpdModel+= '								<label class="col-sm-4 control-label">' + json.entry_email_sender + '</label>';
+			dpdModel+= '								<div class="col-sm-5">';
+			dpdModel+= '									<input type="text" name="email_rec" value="' + json.email_rec + '" class="form-control">';
+			dpdModel+= '								</div>';
+			dpdModel+= '							</div>';
+			dpdModel+= '						</div>';
+			dpdModel+= '						<div class="form-group">';
+			dpdModel+= '						<div class="sh-flex">';
+			dpdModel+= '							<label class="col-sm-4 control-label" for="input-pass-rec">' + json.entry_pass + '</label>';
+			dpdModel+= '							<div class="col-sm-4">';
+			dpdModel+= '								<div class="checkbox">';
+			dpdModel+= '									<label>';
+															if(json.pass_rec == '1' || json.pass_rec == 'on'){
+			dpdModel+= '									<input type="checkbox" id="input-pass-rec" name="pass_rec" checked="checked" />';
+															}else{
+			dpdModel+= '									<input type="checkbox" id="input-pass-rec" name="pass_rec" />';
+															}
+			dpdModel+= '									</label>';
+			dpdModel+= '								</div>';
+			dpdModel+= '							</div>';
+			dpdModel+= '						</div>';
+			dpdModel+= '						</div>';
+			dpdModel+= '						<div class="alert alert-info" align="center" role="alert">' + json.entry_h_address + '</div>';
+			dpdModel+= '						<div class="form-group">';
+			dpdModel+= '							<label class="col-sm-4 control-label" for="input-city">' + json.entry_city_rec + '</label>';
+			dpdModel+= '							<div class="col-sm-8">';
+			dpdModel+= '								<p class="form-control-static">' + json.city_rec + '</p>';
+			dpdModel+= '								<input type="hidden" name="city_id_rec" value="' + json.city_id_rec + '" />';
+			dpdModel+= '							</div>';
+			dpdModel+= '					    </div>';
+												if(json.selfdelivery == '1'){
+			dpdModel+= '						<div id="terminal-rec" class="form-group">';
+			dpdModel+= '							<label class="col-sm-4 control-label" for="input-terminal-rec">' + json.entry_terminal_sender + '</label>';
+			dpdModel+= '						    <div class="col-sm-8">';
+			dpdModel+= '								<select name="terminal_rec" id="input-terminal-rec" class="form-control">';
+														for (var key in json.terminal_rec_arr) {
+															if(json.terminal_rec_arr[key].CODE == json.terminal_rec){
+			dpdModel+= '									<option value="' + json.terminal_rec_arr[key].CODE + '" selected="selected">' + json.terminal_rec_arr[key].NAME + '</option>';
+															}else{
+			dpdModel+= '									<option value="' + json.terminal_rec_arr[key].CODE + '">' + json.terminal_rec_arr[key].NAME + '</option>';
+															}
+														}
+			dpdModel+= '								</select>';
+														if(json.not){
+															if(json.not.rec){
+			dpdModel+= '								<div id="error-rec-dimensions" class="text-danger">' + json.not.rec + '</div>';
+															}
+														}
+			dpdModel+= '							</div>';
+			dpdModel+= '						</div>';
+												}else{
+			dpdModel+= '						<div id="door-rec">';
+			dpdModel+= '						<div class="form-group">';
+			dpdModel+= '							<div class="sh-flex">';
+			dpdModel+= '								<label class="col-sm-4 control-label">' + json.entry_street_sender + '</label>';
+			dpdModel+= '								<div class="col-sm-4">';
+			dpdModel+= '									<input type="text" name="street_rec" value="' + json.street_rec + '" class="form-control">';
+			dpdModel+= '								</div>';
+			dpdModel+= '							</div>';
+			dpdModel+= '						</div>';
+			dpdModel+= '						<div class="form-group">';
+			dpdModel+= '							<div class="sh-flex">';
+			dpdModel+= '								<label class="col-sm-4 control-label"><span data-toggle="tooltip" title="' + json.help_ab_street_sender + '">' + json.entry_ab_street_sender + '</label>';
+			dpdModel+= '								<div class="col-sm-4">';
+			dpdModel+= '									<input type="text" name="ab_street_rec" value="' + json.ab_street_rec + '" class="form-control">';
+			dpdModel+= '								</div>';
+			dpdModel+= '							</div>';
+			dpdModel+= '						</div>';
+			dpdModel+= '						<div class="form-group">';
+			dpdModel+= '							<div class="sh-flex">';
+			dpdModel+= '								<label class="col-sm-4 control-label">' + json.entry_house_sender + '</label>';
+			dpdModel+= '								<div class="col-sm-4">';
+			dpdModel+= '									<input type="text" name="house_rec" value="' + json.house_rec + '" class="form-control">';
+			dpdModel+= '								</div>';
+			dpdModel+= '							</div>';
+			dpdModel+= '						</div>';
+			dpdModel+= '						<div class="form-group">';
+			dpdModel+= '							<div class="sh-flex">';
+			dpdModel+= '								<label class="col-sm-4 control-label">' + json.entry_corp_sender + '</label>';
+			dpdModel+= '								<div class="col-sm-4">';
+			dpdModel+= '									<input type="text" name="corp_rec" value="' + json.corp_rec + '" class="form-control">';
+			dpdModel+= '								</div>';
+			dpdModel+= '							</div>';
+			dpdModel+= '						</div>';
+			dpdModel+= '						<div class="form-group">';
+			dpdModel+= '							<div class="sh-flex">';
+			dpdModel+= '								<label class="col-sm-4 control-label">' + json.entry_structure_sender + '</label>';
+			dpdModel+= '								<div class="col-sm-4">';
+			dpdModel+= '									<input type="text" name="structure_rec" value="' + json.structure_rec + '" class="form-control">';
+			dpdModel+= '								</div>';
+			dpdModel+= '							</div>';
+			dpdModel+= '						</div>';
+			dpdModel+= '						<div class="form-group">';
+			dpdModel+= '							<div class="sh-flex">';
+			dpdModel+= '								<label class="col-sm-4 control-label">' + json.entry_poss_sender + '</label>';
+			dpdModel+= '								<div class="col-sm-4">';
+			dpdModel+= '									<input type="text" name="poss_rec" value="' + json.poss_rec + '" class="form-control">';
+			dpdModel+= '								</div>';
+			dpdModel+= '							</div>';
+			dpdModel+= '						</div>';
+			dpdModel+= '						<div class="form-group">';
+			dpdModel+= '							<div class="sh-flex">';
+			dpdModel+= '								<label class="col-sm-4 control-label">' + json.entry_office_sender + '</label>';
+			dpdModel+= '								<div class="col-sm-4">';
+			dpdModel+= '									<input type="text" name="office_rec" value="' + json.office_rec + '" class="form-control">';
+			dpdModel+= '								</div>';
+			dpdModel+= '							</div>';
+			dpdModel+= '						</div>';
+			dpdModel+= '						<div class="form-group">';
+			dpdModel+= '							<div class="sh-flex">';
+			dpdModel+= '								<label class="col-sm-4 control-label">' + json.entry_apart_sender + '</label>';
+			dpdModel+= '								<div class="col-sm-4">';
+			dpdModel+= '									<input type="text" name="apart_rec" value="' + json.apart_rec + '" class="form-control">';
+			dpdModel+= '								</div>';
+			dpdModel+= '							</div>';
+			dpdModel+= '						</div>';
+			dpdModel+= '						</div>';
+												}
+			dpdModel+= '						<div class="form-group">';
+			dpdModel+= '							<div class="sh-flex">';
+			dpdModel+= '								<label class="col-sm-4 control-label">' + json.entry_comment_order + '</label>';
+			dpdModel+= '								<div class="col-sm-4">';
+			dpdModel+= '									<input type="text" name="comment_rec" value="' + json.comment_rec + '" class="form-control">';
+			dpdModel+= '								</div>';
+			dpdModel+= '							</div>';
+			dpdModel+= '						</div>';
+			dpdModel+= '					</div>';
+			dpdModel+= '					<div class="tab-pane" id="tab-payment">';
+			dpdModel+= '						<div class="alert alert-warning" style="color:black;"  role="alert">';
+			dpdModel+= '							<b class="text-danger">' + json.text_dimensions_warning + '</b>';
+			dpdModel+= '							</br>' + json.text_sum_currency_order;
+			dpdModel+= '							</br>' + json.text_price_product_for_1;
+			dpdModel+= '						</div>';
+			dpdModel+= '						<div class="alert alert-info" align="center" role="alert">' + json.text_composition_order + '</div>';
+			dpdModel+= '						<table class="table">';
+			dpdModel+= '							<thead>';
+			dpdModel+= '								<tr>';
+			dpdModel+= '									<th style="text-align:center;">' + json.entry_name_product + '</th>';
+			dpdModel+= '									<th style="text-align:center;">' + json.entry_quantity_product + '</th>';
+			dpdModel+= '									<th style="text-align:center;">' + json.entry_declared_product + '</th>';
+			dpdModel+= '									<th style="text-align:center;">' + json.entry_npp_product + '</th>';
+			dpdModel+= '								</tr>';
+			dpdModel+= '							</thead>';
+			dpdModel+= '							<tbody>';
+														var product_row = 0;
+														for (var key in json.order_products) {
+			dpdModel+= '									<tr class="active">';
+			dpdModel+= '										<td align="center">' + json.order_products[key].NAME;
+			dpdModel+= '										<input class="form-control" type="hidden" name="product[' + product_row + '][order_product_id]" value="' + json.order_products[key].order_product_id + '" >';
+			dpdModel+= '										<input class="form-control" type="hidden" name="product[' + product_row + '][product_id]" value="' + json.order_products[key].product_id + '" >';
+			dpdModel+= '										<input class="form-control" type="hidden" name="product[' + product_row + '][name]" value="' + json.order_products[key].NAME + '" >';
+			dpdModel+= '										<input class="form-control" type="hidden" name="product[' + product_row + '][price]" value="' + json.order_products[key].PRICE + '" >';
+																for (var j in json.order_products[key].option) {
+			dpdModel+= '											<input type="hidden" name="product[' + product_row + '][option][' + json.order_products[key].option[j].product_option_id + ']" value="' + json.order_products[key].option[j].product_option_value_id + '" />';
+			dpdModel+= '											<br />';
+			dpdModel+= '											- <small>' + json.order_products[key].option[j].name + ': ' + json.order_products[key].option[j].value + '</small><br />';
+																}
+			dpdModel+= '										</td>';
+			dpdModel+= '										<td align="center"><input style="width:70px;" id="quantity" class="form-control" type="number" name="product[' + product_row + '][quantity]" value="' + json.order_products[key].QUANTITY + '" ></td>';
+																if(json.declared_check == true){
+			dpdModel+= '										<td align="center"><input style="width:70px;" id="declared' + json.order_products[key].product_id + '" class="form-control declared" type="text" name="product[' + product_row + '][declared_value]" value="' + json.order_products[key].declared_value + '"></td>';
+																}else{
+			dpdModel+= '										<td align="center"><input style="width:70px;" id="declared' + json.order_products[key].product_id + '" disabled class="form-control declared" type="text" name="product[' + product_row + '][declared_value]" value="0"></td>';
+																}
+																
+																if(json.order_npp_check == true){
+			dpdModel+= '										<td align="center"><input style="width:70px;" id="npp' + json.order_products[key].product_id + '" class="form-control npp" type="text" name="product[' + product_row + '][order_npp_value]" value="' + json.order_products[key].order_npp_value + '"></td>';
+																}else{
+			dpdModel+= '										<td align="center"><input style="width:70px;" id="npp' + json.order_products[key].product_id + '" class="form-control npp" type="text" name="product[' + product_row + '][order_npp_value]" disabled value="0" ></td>';
+																}
+
+			dpdModel+= '										<td align="center"><select name="product[' + product_row + '][VAT_RATE]" id="input-prod-vat" class="form-control">';													
+																for (var key2 in json.NDS) {
+																	if(json.NDS[key2].value == json.order_products[key].VAT_RATE){
+			dpdModel+= '												<option selected="selected" value="' + json.NDS[key2].value + '">' + json.NDS[key2].name + '</option>';													
+																	}else{
+			dpdModel+= '												<option value="' + json.NDS[key2].value + '">' + json.NDS[key2].name + '</option>';													
+																	}
+																}
+			dpdModel+= '										</select></td>';
+			dpdModel+= '									</tr>';
+															product_row = product_row + 1;
+														}
+														if(json.payment_method_delivery !== 'ОУП'){
+			dpdModel+= '								<tr class="active" id="delivery">';
+			dpdModel+= '									<td align="center">Доставка</td>';
+			dpdModel+= '									<td align="center"><input style="width:70px;" id="quantity-delivery" class="form-control" type="number" name="quantity_delivery" value="1" ></td>';
+															if(json.declared_check == true){
+			dpdModel+= '									<td align="center"><input style="width:70px;" id="declared-delivery" class="form-control" type="text" name="declared_delivery" value="' + json.price_oc_delivery + '" ></td>';
+															}else{
+			dpdModel+= '									<td align="center"><input style="width:70px;" id="declared-delivery" disabled  class="form-control" type="text" name="declared_delivery" value="0" ></td>';
+															}
+															
+															if(json.order_npp_check == true){
+			dpdModel+= '									<td align="center"><input style="width:70px;" id="npp-delivery" class="form-control" type="text" name="npp_delivery" value="' + json.price_declared_delivery + '"></td>';
+															}else{
+			dpdModel+= '									<td align="center"><input style="width:70px;" id="npp-delivery" disabled value="0" class="form-control" type="text" name="npp_delivery"></td>';
+															}
+			dpdModel+= '									<td align="center"><select name="tax_delivery" id="input-delivery-vat" class="form-control">';
+															if(json.tax_delivery != 0){
+			dpdModel+= '										<option value="0">Без НДС</option>';
+			dpdModel+= '										<option selected="selected" value="20">НДС 20%</option>';		
+															}else{
+			dpdModel+= '										<option selected="selected" value="0">Без НДС</option>';
+			dpdModel+= '										<option value="20">НДС 20%</option>';												
+															}
+			dpdModel+= '									</select></td>';
+			dpdModel+= '								</tr>';
+														}
+			dpdModel+= '							</tbody>';
+			dpdModel+= '						</table>';
+			dpdModel+= '						<div class="alert alert-info" align="center" role="alert">' + json.entry_declared_product + '</div>';
+			dpdModel+= '						<div class="form-group">';
+			dpdModel+= '						<div class="sh-flex">';
+			dpdModel+= '							<label class="col-sm-4 control-label" for="input-declared-check">' + json.entry_declared_check + '</label>';
+			dpdModel+= '							<div class="col-sm-4">';
+			dpdModel+= '								<div class="checkbox">';
+			dpdModel+= '									<label>';
+															if(json.declared_check == true){
+			dpdModel+= '									<input type="checkbox" id="input-declared-check" name="declared_check" checked="checked" />';
+															}else{
+			dpdModel+= '									<input type="checkbox" id="input-declared-check" name="declared_check" />';
+															}
+			dpdModel+= '									</label>';
+			dpdModel+= '								</div>';
+			dpdModel+= '							</div>';
+			dpdModel+= '						</div>';
+			dpdModel+= '						</div>';
+			dpdModel+= '						<div class="form-group">';
+			dpdModel+= '							<div class="sh-flex">';
+			dpdModel+= '								<label class="col-sm-4 control-label">' + json.entry_declared_value + '</label>';
+			dpdModel+= '								<div class="col-sm-2">';
+															if(json.declared_check == true){
+			dpdModel+= '									<input value="' + json.declared_value + '" id="input-declared-value" type="text" readonly name="declared_value" class="form-control">';
+															}else{
+			dpdModel+= '									<input disabled value="0" id="input-declared-value" type="text" name="declared_value" class="form-control">';
+															}
+			dpdModel+= '								</div>';
+			dpdModel+= '							</div>';
+			dpdModel+= '						</div>';
+			dpdModel+= '						<div class="alert alert-info" align="center" role="alert">' + json.entry_npp_product + '</div>';
+			dpdModel+= '						<div class="form-group">';
+			dpdModel+= '						<div class="sh-flex">';
+			dpdModel+= '							<label class="col-sm-4 control-label" for="input-npp-check">' + json.entry_npp_check + '</label>';
+			dpdModel+= '							<div class="col-sm-4">';
+			dpdModel+= '								<div class="checkbox">';
+			dpdModel+= '									<label>';
+															if(json.order_npp_check == true){
+			dpdModel+= '									<input type="checkbox" id="input-npp-check" name="order_npp_check" checked="checked" />';
+															}else{
+			dpdModel+= '									<input type="checkbox" id="input-npp-check" name="order_npp_check" />';
+															}
+			dpdModel+= '									</label>';
+			dpdModel+= '								</div>';
+			dpdModel+= '							</div>';
+			dpdModel+= '						</div>';
+			dpdModel+= '						</div>';
+			dpdModel+= '						<div class="form-group">';
+			dpdModel+= '							<div class="sh-flex">';
+			dpdModel+= '								<label class="col-sm-4 control-label">' + json.entry_npp_value + '</label>';
+			dpdModel+= '								<div class="col-sm-2">';
+															if(json.order_npp_check == true){
+			dpdModel+= '									<input value="' + json.order_npp_value + '" id="input-npp-value" type="text" readonly name="order_npp_value" class="form-control">';
+															}else{
+			dpdModel+= '									<input disabled value="0" id="input-npp-value" type="text" name="order_npp_value" class="form-control">';
+															}
+			dpdModel+= '								</div>';
+			dpdModel+= '							</div>';
+			dpdModel+= '						</div>';
+			dpdModel+= '					</div>';
+			dpdModel+= '					<div class="tab-pane" id="tab-option">';
+			dpdModel+= '						<div class="alert alert-warning" style="color:black;"  role="alert">';
+			dpdModel+= '							<b>' + json.text_dimensions_warning + '</b>' + json.text_option;
+			dpdModel+= '						</div>';
+			dpdModel+= '						<div class="form-group">';
+			dpdModel+= '							<label class="col-sm-4 control-label" for="input-val-cargo"><span data-toggle="tooltip" title="' + json.help_val_cargo + '">' + json.entry_val_cargo + '</span></label>';
+			dpdModel+= '							<div class="col-sm-4">';
+			dpdModel+= '								<div class="checkbox">';
+			dpdModel+= '									<label>';
+															if(json.val_cargo == '1'){
+			dpdModel+= '									<input type="checkbox" id="input-val-cargo" name="val_cargo" checked="checked" />';
+															}else{
+			dpdModel+= '									<input type="checkbox" id="input-val-cargo" name="val_cargo" />';
+															}
+			dpdModel+= '									</label>';
+			dpdModel+= '								</div>';
+			dpdModel+= '							</div>';
+			dpdModel+= '						</div>';
+			dpdModel+= '						<div class="form-group">';
+			dpdModel+= '							<label class="col-sm-4 control-label" for="input-weekend-delivery"><span data-toggle="tooltip" title="' + json.help_weekend_delivery + '">' + json.entry_weekend_delivery + '</span></label>';
+			dpdModel+= '							<div class="col-sm-5">';
+			dpdModel+= '								<div class="checkbox">';
+			dpdModel+= '									<label>';
+															if(json.weekend_delivery == '1'){
+			dpdModel+= '									<input type="checkbox" id="input-weekend-delivery" name="weekend_delivery" checked="checked" />';
+															}else{
+			dpdModel+= '									<input type="checkbox" id="input-weekend-delivery" name="weekend_delivery" />';
+															}
+			dpdModel+= '									</label>';
+			dpdModel+= '									<div class="text-danger">' + json.warning_weekend_delivery + '</div>';
+			dpdModel+= '								</div>';
+			dpdModel+= '							</div>';
+			dpdModel+= '						</div>';
+			dpdModel+= '						<div class="form-group">';
+			dpdModel+= '							<label class="col-sm-4 control-label" for="input-condition">' + json.entry_condition + '</label>';
+			dpdModel+= '							<div class="col-sm-5">';
+			dpdModel+= '								<div class="checkbo">';
+			dpdModel+= '									<label>';
+															if(json.condition == '1'){
+			dpdModel+= '									<input type="checkbox" id="input-condition" name="condition" checked="checked" />';
+															}else{
+			dpdModel+= '									<input type="checkbox" id="input-condition" name="condition" />';
+															}
+			dpdModel+= '									</label>';
+			dpdModel+= '									<div class="text-danger">' + json.warning_weekend_delivery + '</div>';
+			dpdModel+= '								</div>';
+			dpdModel+= '							</div>';
+			dpdModel+= '						</div>';
+			dpdModel+= '						<div class="form-group">';
+			dpdModel+= '							<label class="col-sm-4 control-label" for="input-loading-unloading"><span data-toggle="tooltip" title="' + json.help_loading_unloading  + '">' + json.entry_loading_unloading + '</span></label>';
+			dpdModel+= '							<div class="col-sm-5">';
+			dpdModel+= '								<div class="checkbox">';
+			dpdModel+= '									<label>';
+															if(json.loading_unloading == '1'){
+			dpdModel+= '									<input type="checkbox" id="input-loading-unloading" name="loading_unloading" checked="checked" />';
+															}else{
+			dpdModel+= '									<input type="checkbox" id="input-loading-unloading" name="loading_unloading" />';
+															}
+			dpdModel+= '									</label>';
+			dpdModel+= '									<div class="text-danger">' + json.warning_weekend_delivery + '</div>';
+			dpdModel+= '								</div>';
+			dpdModel+= '							</div>';
+			dpdModel+= '						</div>';
+			dpdModel+= '						<div class="form-group">';
+			dpdModel+= '							<label class="col-sm-4 control-label" for="input-return-doc"><span data-toggle="tooltip" title="' + json.help_return_doc  + '">' + json.entry_return_doc + '</span></label>';
+			dpdModel+= '							<div class="col-sm-5">';
+			dpdModel+= '								<div class="checkbox">';
+			dpdModel+= '									<label>';
+															if(json.return_doc == '1'){
+			dpdModel+= '									<input type="checkbox" id="input-return-doc" name="return_doc" checked="checked" />';
+															}else{
+			dpdModel+= '									<input type="checkbox" id="input-return-doc" name="return_doc" />';
+															}
+			dpdModel+= '									</label>';
+			dpdModel+= '									<div class="text-danger">' + json.warning_weekend_delivery + '</div>';
+			dpdModel+= '								</div>';
+			dpdModel+= '							</div>';
+			dpdModel+= '						</div>';
+			dpdModel+= '						<div class="form-group">';
+			dpdModel+= '							<label class="col-sm-4 control-label" for="input-wait-address">' + json.entry_wait_address + '</label>';
+			dpdModel+= '							<div class="col-sm-4">';
+			dpdModel+= '								<select name="wait_address" id="input-wait-address" class="form-control">';
+														for (var key in json.waiting_address) {
+															if(json.waiting_address[key].value == json.wait_address){
+			dpdModel+= '									<option value="' + json.waiting_address[key].value + '" selected="selected">' + json.waiting_address[key].name + '</option>';
+															}else{
+			dpdModel+= '									<option value="' + json.waiting_address[key].value + '">' + json.waiting_address[key].name + '</option>';
+															}
+														}
+			dpdModel+= '								</select>';
+			dpdModel+= '							</div>';
+			dpdModel+= '						</div>';
+			dpdModel+= '						<div class="alert alert-info" align="center" role="alert">' + json.entry_h_alert + '</div>';
+			dpdModel+= '						<div class="form-group">';
+			dpdModel+= '							<div class="sh-flex">';
+			dpdModel+= '								<label class="col-sm-4 control-label"><span data-toggle="tooltip" title="' + json.help_order_mail  + '">' + json.entry_order_mail + '</span></label>';
+			dpdModel+= '								<div class="col-sm-4">';
+			dpdModel+= '									<input type="text" name="order_mail" value="' + json.order_mail + '" class="form-control">';
+			dpdModel+= '								</div>';
+			dpdModel+= '							</div>';
+			dpdModel+= '						</div>';
+			dpdModel+= '					</div>';
+			dpdModel+= '					<div class="tab-pane" id="tab-doc">';
+											if((json.dpd_orders.status_dpd == 'NEW') || (json.dpd_orders.status_dpd == 'Canceled') || (json.dpd_orders.status_dpd == 'OrderError')  || (json.dpd_orders.status_dpd == 'OrderPending')){
+			dpdModel+= '						<div class="alert alert-warning" style="color:black;" role="alert">' + json.text_doc_print + '</div>';
+											}else{
+			dpdModel+= '						<div class="alert alert-info" align="center" style="color:black;" role="alert">Накладная</div>';
+												if(json.invoice){
+			dpdModel+= '						<div class="form-group">';
+			dpdModel+= '							<label class="col-sm-4 control-label">Файл накладной: <a href="' + json.invoice + '" target="_blank">Скачать</a></label>';
+			dpdModel+= '						</div>';										
+												}
+			dpdModel+= '						<div class="form-group">';
+			dpdModel+= '						<div class="col-sm-4 control-label">';
+			dpdModel+= '							<button type="button" id="sendInvoice" class="btn btn-default">Обновить файл накладной</button>';
+			dpdModel+= '						</div>';
+			dpdModel+= '						</div>';
+			dpdModel+= '						<div class="alert alert-info" align="center" style="color:black;" role="alert">Печать наклеек</div>';
+												if(json.label){
+			dpdModel+= '						<div class="form-group">';
+			dpdModel+= '							<label class="col-sm-4 control-label">Файл наклеек: <a href="' + json.label + '" target="_blank">Скачать</a></label>';
+			dpdModel+= '						</div>';										
+												}
+			dpdModel+= '						<div class="form-group">';
+			dpdModel+= '							<label class="col-sm-4 control-label" for="input-label-format"></label>';
+			dpdModel+= '							<div class="col-sm-4">';
+			dpdModel+= '								<input type="text" name="label_count" value="1" class="form-control">';
+			dpdModel+= '							</div>';
+			dpdModel+= '						</div>';
+			dpdModel+= '						<div class="form-group">';
+			dpdModel+= '							<label class="col-sm-4 control-label" for="input-label-format">Формат файла:</label>';
+			dpdModel+= '							<div class="col-sm-4">';
+			dpdModel+= '								<select name="label_format" id="input-label-format" class="form-control">';
+			dpdModel+= '									<option value="PDF">PDF</option>';
+			dpdModel+= '									<option value="FP3">FP3</option>';
+			dpdModel+= '								</select>';
+			dpdModel+= '							</div>';
+			dpdModel+= '						</div>';
+			dpdModel+= '						<div class="form-group">';
+			dpdModel+= '							<label class="col-sm-4 control-label" for="input-labelobl-format">Формат области печати:</label>';
+			dpdModel+= '							<div class="col-sm-4">';
+			dpdModel+= '								<select name="label_format_size" id="input-labelobl-format" class="form-control">';
+			dpdModel+= '									<option value="A5">A5</option>';
+			dpdModel+= '									<option value="A6">A6</option>';
+			dpdModel+= '								</select>';
+			dpdModel+= '							</div>';
+			dpdModel+= '						</div>';									
+			dpdModel+= '						<div class="form-group">';
+			dpdModel+= '						<div class="col-sm-4 control-label">';
+			dpdModel+= '						<button type="button" id="sendLabel" class="btn btn-default">Обновить файл наклеек</button>';
+			dpdModel+= '						</div>';
+			dpdModel+= '						</div>';
+											}
+			dpdModel+= '					</div>';
+			dpdModel+= '				</div>';
+			dpdModel+= '			</form>';
+			dpdModel+= '			<div class="col-sm-12">';
+			dpdModel+= '				<div class="col-sm-4"></div>';
+			dpdModel+= '				<div class="col-sm-8">';
+			dpdModel+= '					<br />';
+			dpdModel+= '					<div class="alert alert-success" role="alert">';
+			dpdModel+= '						<table style="font-size:13px;" class="table">';
+			dpdModel+= '							<tbody>';
+			dpdModel+= '							  <tr>';
+			dpdModel+= '								<td style="color:black;">' + json.entry_order_price_products + '</td><td class="pull-right" id="product-total" style="color:black;">' + json.total_product_price + '</td>';
+			dpdModel+= '							  </tr>';
+			dpdModel+= '							  <tr>';
+			dpdModel+= '								<td style="color:black;">' + json.entry_order_price_npp + '</td><td class="pull-right" id="markup-total" style="color:black;">' + json.price_delivery_total + '</td>';
+			dpdModel+= '							  </tr>';
+			dpdModel+= '							  <tr>';
+			dpdModel+= '								<td style="color:black;">' + json.entry_order_price_delivery + '</td><td class="pull-right" id="delivery-total" style="color:black;">' + json.price_delivery_markup + '</td>';
+			dpdModel+= '							  </tr>';
+			dpdModel+= '							  <tr>';
+														if(json.paid == true){
+			dpdModel+= '								<td style="color:black;"><b>' + json.entry_paid + '</b></td><td class="pull-right" style="color:black;"><b>' + json.total_product_price + '</b></td>';
+														}else{
+			dpdModel+= '								<td style="color:black;"><b>' + json.entry_paid + '</b></td><td class="pull-right" style="color:black;"><b> 0 </b></td>';
+														}
+			dpdModel+= '							  </tr>';
+			dpdModel+= '							  <tr>';
+														if(json.declared_check == true){
+			dpdModel+= '								<td style="color:black;"><b>' + json.entry_total_oc + '</b></td><td class="pull-right" id="declared-total" style="color:black;"><b>' + json.total_declared_product_price + '</b></td>';
+														}else{
+			dpdModel+= '								<td style="color:black;"><b>' + json.entry_total_oc + '</b></td><td class="pull-right" id="declared-total" style="color:black;"><b> 0 </b></td>';
+														}
+			dpdModel+= '							  </tr>';
+			dpdModel+= '							  <tr>';
+														if(json.order_npp_check == true){
+			dpdModel+= '								<td style="color:black;"><b>' + json.entry_payment_npp + '</b></td><td class="pull-right" id="npp-total" style="color:black;"><b>' + json.total_npp_product_price + '</b></td>';
+														}else{
+			dpdModel+= '								<td style="color:black;"><b>' + json.entry_payment_npp + '</b></td><td class="pull-right" id="npp-total" style="color:black;"><b> 0 </b></td>';
+														}
+			dpdModel+= '							  </tr>';
+			dpdModel+= '						  </tbody>';
+			dpdModel+= '						</table>';
+			dpdModel+= '					</div>';
+			dpdModel+= '				</div>'
+			dpdModel+= '			</div>';
+			dpdModel+= '		  <div class="modal-footer">';
+			dpdModel+= '			<button type="button" class="btn btn-secondary pull-left" data-dismiss="modal">Закрыть</button>';
+									if((json.dpd_orders.status_dpd == 'NEW') || (json.dpd_orders.status_dpd == 'Canceled') || (json.dpd_orders.status_dpd == 'OrderError')){
+			dpdModel+= '			<button type="button" id="sendOrder" class="btn btn-success pull-left">Создать заказ</button>';
+									}else{
+			dpdModel+= '			<button type="button" id="sendOrder" class="btn btn-secondary pull-left">Отменить заказ</button>';						
+									}
+			dpdModel+= '		  </div>';
+			dpdModel+= '		</div>';
+			dpdModel+= '	  </div>';
+			dpdModel+= '	</div>';
+			dpdModel+= '</div>';
+			
+			$('body').append(dpdModel);
+			
+			setTimeout(function() {
+				$('#dpd-model').modal('show');
+				if(tab !== ''){
+					$('#' + tab).trigger('click');
+				}
+				
+				if((json.dpd_orders.status_dpd !== 'NEW') && (json.dpd_orders.status_dpd !== 'Canceled')  && (json.dpd_orders.status_dpd !== 'OrderError')){
+					$('#dpd-model :input').attr('disabled', true);
+					$('#dpd-model :button').attr('disabled', false);
+					
+					if(json.dpd_orders.status_dpd !== 'OrderPending'){
+						$('#tab-doc :input').attr('disabled', false);
+					}
+				}
+				
+			}, 1000);
+			
+			$('.date').datetimepicker(
+				{
+				format: 'DD.MM.YYYY', 
+				pickTime: false,
+				language: 'ru',
+				}
+			);
+			
+			$("#input-variable-delivery, #input-terminal-sender, #quantity-delivery, #declared-delivery, #npp-delivery, #input-terminal-rec, .npp, .declared, #quantity, #input-weight-shipment, #input-height, #input-width, #input-length, #input-delivery-method, #input-declared-check, #input-npp-check, #input-payment-method, #input-payment-method2").change(function(){
+				sendDpd('{{ order_id }}', $('#myModel .active a').attr('id'));
+			});
+	    },
+		error: function(xhr, ajaxOptions, thrownError) {
+			alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+		}
+	});
+	
+	$('#dpd-model').on('hidden.bs.modal', function(e) {
+		$(this).remove();
+	});
+  }
+		<!-- / dpd  -->
+		
+$(document).delegate('#button-invoice', 'click', function() {
+	$.ajax({
+		url: 'index.php?route=sale/order/createinvoiceno&user_token={{ user_token }}&order_id={{ order_id }}',
+		dataType: 'json',
+		beforeSend: function() {
+			$('#button-invoice').button('loading');
+		},
+		complete: function() {
+			$('#button-invoice').button('reset');
+		},
+		success: function(json) {
+			$('.alert-dismissible').remove();
+
+			if (json['error']) {
+				$('#content > .container-fluid').prepend('<div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + json['error'] + '</div>');
+			}
+
+			if (json['invoice_no']) {
+				$('#invoice').html(json['invoice_no']);
+
+				$('#button-invoice').replaceWith('<button disabled="disabled" class="btn btn-success btn-xs"><i class="fa fa-cog"></i></button>');
+			}
+		},
+		error: function(xhr, ajaxOptions, thrownError) {
+			alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+		}
+	});
+});
+
+$(document).delegate('#button-reward-add', 'click', function() {
+	$.ajax({
+		url: 'index.php?route=sale/order/addreward&user_token={{ user_token }}&order_id={{ order_id }}',
+		type: 'post',
+		dataType: 'json',
+		beforeSend: function() {
+			$('#button-reward-add').button('loading');
+		},
+		complete: function() {
+			$('#button-reward-add').button('reset');
+		},
+		success: function(json) {
+			$('.alert-dismissible').remove();
+
+			if (json['error']) {
+				$('#content > .container-fluid').prepend('<div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + json['error'] + '</div>');
+			}
+
+			if (json['success']) {
+                $('#content > .container-fluid').prepend('<div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> ' + json['success'] + '</div>');
+
+				$('#button-reward-add').replaceWith('<button id="button-reward-remove" data-toggle="tooltip" title="{{ button_reward_remove }}" class="btn btn-danger btn-xs"><i class="fa fa-minus-circle"></i></button>');
+			}
+		},
+		error: function(xhr, ajaxOptions, thrownError) {
+			alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+		}
+	});
+});
+
+$(document).delegate('#button-reward-remove', 'click', function() {
+	$.ajax({
+		url: 'index.php?route=sale/order/removereward&user_token={{ user_token }}&order_id={{ order_id }}',
+		type: 'post',
+		dataType: 'json',
+		beforeSend: function() {
+			$('#button-reward-remove').button('loading');
+		},
+		complete: function() {
+			$('#button-reward-remove').button('reset');
+		},
+		success: function(json) {
+			$('.alert-dismissible').remove();
+
+			if (json['error']) {
+				$('#content > .container-fluid').prepend('<div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + json['error'] + '</div>');
+			}
+
+			if (json['success']) {
+                $('#content > .container-fluid').prepend('<div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> ' + json['success'] + '</div>');
+
+				$('#button-reward-remove').replaceWith('<button id="button-reward-add" data-toggle="tooltip" title="{{ button_reward_add }}" class="btn btn-success btn-xs"><i class="fa fa-plus-circle"></i></button>');
+			}
+		},
+		error: function(xhr, ajaxOptions, thrownError) {
+			alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+		}
+	});
+});
+
+$(document).delegate('#button-commission-add', 'click', function() {
+	$.ajax({
+		url: 'index.php?route=sale/order/addcommission&user_token={{ user_token }}&order_id={{ order_id }}',
+		type: 'post',
+		dataType: 'json',
+		beforeSend: function() {
+			$('#button-commission-add').button('loading');
+		},
+		complete: function() {
+			$('#button-commission-add').button('reset');
+		},
+		success: function(json) {
+			$('.alert-dismissible').remove();
+
+			if (json['error']) {
+				$('#content > .container-fluid').prepend('<div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + json['error'] + '</div>');
+			}
+
+			if (json['success']) {
+                $('#content > .container-fluid').prepend('<div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> ' + json['success'] + '</div>');
+
+				$('#button-commission-add').replaceWith('<button id="button-commission-remove" data-toggle="tooltip" title="{{ button_commission_remove }}" class="btn btn-danger btn-xs"><i class="fa fa-minus-circle"></i></button>');
+			}
+		},
+		error: function(xhr, ajaxOptions, thrownError) {
+			alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+		}
+	});
+});
+
+$(document).delegate('#button-commission-remove', 'click', function() {
+	$.ajax({
+		url: 'index.php?route=sale/order/removecommission&user_token={{ user_token }}&order_id={{ order_id }}',
+		type: 'post',
+		dataType: 'json',
+		beforeSend: function() {
+			$('#button-commission-remove').button('loading');
+		},
+		complete: function() {
+			$('#button-commission-remove').button('reset');
+		},
+		success: function(json) {
+			$('.alert-dismissible').remove();
+
+			if (json['error']) {
+				$('#content > .container-fluid').prepend('<div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + json['error'] + '</div>');
+			}
+
+			if (json['success']) {
+                $('#content > .container-fluid').prepend('<div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> ' + json['success'] + '</div>');
+
+				$('#button-commission-remove').replaceWith('<button id="button-commission-add" data-toggle="tooltip" title="{{ button_commission_add }}" class="btn btn-success btn-xs"><i class="fa fa-plus-circle"></i></button>');
+			}
+		},
+		error: function(xhr, ajaxOptions, thrownError) {
+			alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+		}
+	});
+});
+
+$('#history').delegate('.pagination a', 'click', function(e) {
+	e.preventDefault();
+
+	$('#history').load(this.href);
+});
+
+$('#history').load('index.php?route=sale/order/history&user_token={{ user_token }}&order_id={{ order_id }}');
+
+$('#button-history').on('click', function() {
+	$.ajax({
+		url: '{{ catalog }}index.php?route=api/order/history&api_token={{ api_token }}&store_id={{ store_id }}&order_id={{ order_id }}',
+		type: 'post',
+		dataType: 'json',
+		data: 'order_status_id=' + encodeURIComponent($('select[name=\'order_status_id\']').val()) + '&notify=' + ($('input[name=\'notify\']').prop('checked') ? 1 : 0) + '&override=' + ($('input[name=\'override\']').prop('checked') ? 1 : 0) + '&append=' + ($('input[name=\'append\']').prop('checked') ? 1 : 0) + '&comment=' + encodeURIComponent($('textarea[name=\'comment\']').val()),
+		beforeSend: function() {
+			$('#button-history').button('loading');
+		},
+		complete: function() {
+			$('#button-history').button('reset');
+		},
+		success: function(json) {
+			$('.alert-dismissible').remove();
+
+			if (json['error']) {
+				$('#history').before('<div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + json['error'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+			}
+
+			if (json['success']) {
+				$('#history').load('index.php?route=sale/order/history&user_token={{ user_token }}&order_id={{ order_id }}');
+
+				$('#history').before('<div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> ' + json['success'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+
+				$('textarea[name=\'comment\']').val('');
+			}
+		},
+		error: function(xhr, ajaxOptions, thrownError) {
+			alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+		}
+	});
+});
+//--></script> 
+</div>
+{{ footer }} 

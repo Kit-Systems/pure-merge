@@ -1,0 +1,1329 @@
+{{ header }}{{ column_left }}
+<div id="content">
+	<div class="page-header">
+		<div class="container-fluid">
+			<div class="pull-right">
+				<button onclick="matchregions();" id="matchregions" data-toggle="tooltip" title="Сопоставить регионы" class="btn btn-success"><i class="fa fa-refresh"></i></button>
+				<a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a>
+				{% if button_save %}
+				<button type="submit" form="form-dpd" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-save"></i></button>
+				{% endif %}
+			</div>
+			<ul class="breadcrumb">
+				{% for breadcrumb in breadcrumbs %}
+					{% if breadcrumb.separator %}
+						<li>{{ breadcrum.separator }}</li>
+					{% endif %}
+					<li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+				{% endfor %}
+			</ul>
+		</div>
+	</div>
+	<div class="container-fluid">
+		{% if filled_city %}
+			<div class="alert alert-info"> {{ filled_city }}
+				<button type="button" class="close" data-dismiss="alert">&times;</button>
+			</div>
+		{% endif %}	
+		{% if success %}
+			<div class="alert alert-success"><i class="fa fa-check-circle"></i> {{ success }}
+				<button type="button" class="close" data-dismiss="alert">&times;</button>
+			</div>
+		{% endif %}		
+		{% if error_warning %}
+		<div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+		  <button type="button" class="close" data-dismiss="alert">&times;</button>
+		</div>
+		{% endif %}
+		{% if error_file_exists %}
+              <div class="text-danger">{{ error_file_exists }}</div>
+        {% endif %}
+		<div class="panel panel-default">
+			<div class="panel-body">
+				<form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-dpd" class="form-horizontal">
+				    <ul class="nav nav-tabs">
+					  <li class="active"><a href="#tab-main" data-toggle="tab">{{ tab_main }}</a></li>
+				      <li><a href="#tab-general" data-toggle="tab">{{ tab_general }}</a></li>
+				      <li><a href="#tab-dimensions" data-toggle="tab">{{ tab_dimensions }}</a></li>
+					  <li><a href="#tab-calculate-shipping" data-toggle="tab">{{ tab_calculate_shipping }}</a></li>
+					  <li><a href="#tab-sender" id="test" data-toggle="tab">{{ tab_sender }}</a></li>
+					  <li><a href="#tab-recipient" data-toggle="tab">{{ tab_recipient }}</a></li>
+					  <li><a href="#tab-desc-sender" data-toggle="tab">{{ tab_desc_sender }}</a></li>
+					   <li><a href="#tab-status" data-toggle="tab">{{ tab_status }}</a></li>
+				    </ul>
+				    <div class="tab-content">
+					   <div class="tab-pane active" id="tab-main">
+					   <div class="form-group">
+							<label class="col-sm-2 control-label" for="input-status-module">{{ entry_status_module }}</label>
+							<div class="col-sm-4">
+								<select name="shipping_dpd_status" id="input-status-module" class="form-control">
+									{% if shipping_dpd_status %}
+									<option value="1" selected="selected">{{ text_enabled }}</option>
+									<option value="0">{{ text_disabled }}</option>
+									{% else %}
+									<option value="1">{{ text_enabled }}</option>
+									<option value="0" selected="selected">{{ text_disabled }}</option>
+									{% endif %}
+								</select>
+							</div>
+							<label class="col-sm-2 control-label">{{ entry_sort_order }}</label>
+							<div class="col-sm-4">
+								<input type="number" name="shipping_dpd_sort_order" value="{{ shipping_dpd_sort_order }}" class="form-control">
+							</div>
+						</div>
+						</br>
+						<ul class="nav nav-tabs">
+							<li class="active"><a href="#tab-to-door" data-toggle="tab">{{ tab_to_door }}</a></li>
+							<li><a href="#tab-from-terminal" data-toggle="tab">{{ tab_from_terminal }}</a></li>
+						</ul>
+						<div class="tab-content">
+							<div class="tab-pane active" id="tab-to-door">
+								<div class="form-group required">
+									<div class="sh-flex">
+										<label class="col-sm-2 control-label">{{ entry_name }}</label>
+										<div class="col-sm-4">
+											<input type="text" name="shipping_dpd_name_door" value="{{ shipping_dpd_name_door }}" class="form-control">
+											{% if error_name_door %}
+											  <div class="text-danger">{{ error_name_door }}</div>
+											{% endif %}
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label" for="input-status">{{ entry_status }}</label>
+									<div class="col-sm-4">
+										<select name="shipping_dpd_door_status" id="input-status" class="form-control">
+											{% if shipping_dpd_door_status %}
+											<option value="1" selected="selected">{{ text_enabled }}</option>
+											<option value="0">{{ text_disabled }}</option>
+											{% else %}
+											<option value="1">{{ text_enabled }}</option>
+											<option value="0" selected="selected">{{ text_disabled }}</option>
+											{% endif %}
+										</select>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="sh-flex">
+										<label class="col-sm-2 control-label" for="description">{{ entry_description }}</label>
+										<div class="col-sm-8">
+											<textarea id="description" data-toggle="summernote" name="shipping_dpd_description_door" cols="90" rows="12">{{ shipping_dpd_description_door }}</textarea>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label" for="input-image">{{ entry_image }}</label>
+									<div class="col-sm-10">
+										<a href="" id="thumb-image-door" data-toggle="image" class="img-thumbnail"><img src="{{ shipping_dpd_thumb_door }}" alt="" title="" data-placeholder="{{ placeholder }}" /></a>
+										<input type="hidden" name="shipping_dpd_image_door" value="{{ shipping_dpd_image_door }}" id="input-image" /></td>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="sh-flex">
+										<label class="col-sm-2 control-label">{{ entry_markup }}</label>
+										<div class="col-sm-4">
+											<input type="number" name="shipping_dpd_markup_door" value="{{ shipping_dpd_markup_door }}" class="form-control">
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label" for="input-markup-type">{{ entry_markup_type }}</label>
+									<div class="col-sm-4">
+										<select name="shipping_dpd_markup_type_door" id="input-markup-type" class="form-control">
+											{% if shipping_dpd_markup_type_door %}
+											<option value="1" selected="selected">{{ text_percent }}</option>
+											<option value="0">{{ text_fix }}</option>
+											{% else %}
+											<option value="1">{{ text_percent }}</option>
+											<option value="0" selected="selected">{{ text_fix }}</option>
+											{% endif %}
+										</select>
+									</div>
+								</div>
+							</div>
+							<div class="tab-pane" id="tab-from-terminal">
+								<div class="form-group required">
+									<div class="sh-flex">
+										<label class="col-sm-2 control-label">{{ entry_name }}</label>
+										<div class="col-sm-4">
+											<input type="text" name="shipping_dpd_name_terminal" value="{{ shipping_dpd_name_terminal }}" class="form-control">
+											{% if error_name_terminal %}
+											  <div class="text-danger">{{ error_name_terminal }}</div>
+											{% endif %}
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label" for="input-status">{{ entry_status }}</label>
+									<div class="col-sm-4">
+										<select name="shipping_dpd_terminal_status" id="input-status" class="form-control">
+											{% if shipping_dpd_terminal_status %}
+											<option value="1" selected="selected">{{ text_enabled }}</option>
+											<option value="0">{{ text_disabled }}</option>
+											{% else %}
+											<option value="1">{{ text_enabled }}</option>
+											<option value="0" selected="selected">{{ text_disabled }}</option>
+											{% endif %}
+										</select>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="sh-flex">
+										<label class="col-sm-2 control-label" for="description">{{ entry_description }}</label>
+										<div class="col-sm-8">
+											<textarea id="description" data-toggle="summernote" name="shipping_dpd_description_terminal" cols="90" rows="12">{{ shipping_dpd_description_terminal }}</textarea>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label" for="input-image-terminal">{{ entry_image }}</label>
+									<div class="col-sm-10">
+										<a href="" id="thumb-image-terminal" data-toggle="image" class="img-thumbnail"><img src="{{ shipping_dpd_thumb_terminal }}" alt="" title="" data-placeholder="{{ placeholder }}" /></a>
+										<input type="hidden" name="shipping_dpd_image_terminal" value="{{ shipping_dpd_image_terminal }}" id="input-image-terminal" /></td>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="sh-flex">
+										<label class="col-sm-2 control-label">{{ entry_markup }}</label>
+										<div class="col-sm-4">
+											<input type="number" name="shipping_dpd_markup_terminal" value="{{ shipping_dpd_markup_terminal }}" class="form-control">
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label" for="input-markup-type">{{ entry_markup_type }}</label>
+									<div class="col-sm-4">
+										<select name="shipping_dpd_markup_type_terminal" id="input-markup-type" class="form-control">
+											{% if shipping_dpd_markup_type_terminal %}
+											<option value="1" selected="selected">{{ text_percent }}</option>
+											<option value="0">{{ text_fix }}</option>
+											{% else %}
+											<option value="1">{{ text_percent }}</option>
+											<option value="0" selected="selected">{{ text_fix }}</option>
+											{% endif %}
+										</select>
+									</div>
+								</div>
+							</div>
+						</div>
+					   </div>
+					   <div class="tab-pane" id="tab-general">
+						<div class="alert alert-warning" style="color:black;" role="alert">
+							{{ text_main_setting }}<a href="http://www.dpd.ru/ols/order/personal/integrationkey.do2" target="_blank">http://www.dpd.ru/ols/order/personal/integrationkey.do2</a>{{ text_main_setting_end }}
+					    </div>
+						<ul class="nav nav-tabs">
+						  <li class="active"><a href="#tab-russian" data-toggle="tab">{{ tab_russian }}</a></li>
+						  <li><a href="#tab-kazahstan" data-toggle="tab">{{ tab_kazahstan }}</a></li>
+						  <li><a href="#tab-belarus" data-toggle="tab">{{ tab_belarus }}</a></li>
+						</ul>
+						<div class="tab-content">
+							<div class="tab-pane active" id="tab-russian">
+								{{ text_auth_russian }}
+								<div class="form-group required">
+									<div class="sh-flex">
+										<label class="col-sm-4 control-label"><span data-toggle="tooltip" title="{{ help_number }}">{{ entry_dpd_number }}</span></label>
+										<div class="col-sm-4">
+											<input type="text" name="shipping_dpd_russian_number" value="{{ shipping_dpd_russian_number }}" class="form-control">
+											{% if error_russian_number %}
+											  <div class="text-danger">{{ error_russian_number }}</div>
+											{% endif %}
+										</div>
+									</div>
+								</div>
+								<div class="form-group required">
+									<div class="sh-flex">
+										<label class="col-sm-4 control-label"><span data-toggle="tooltip" title="{{ help_auth }}">{{ entry_dpd_auth }}</span></label>
+										<div class="col-sm-4">
+											<input type="text" name="shipping_dpd_russian_auth" value="{{ shipping_dpd_russian_auth }}" class="form-control">
+											{% if error_russian_auth %}
+											  <div class="text-danger">{{ error_russian_auth }}</div>
+											{% endif %}
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+								<label class="col-sm-4 control-label" for="input-currency">{{ entry_currency }}</label>
+								<div class="col-sm-4">
+									<select name="shipping_dpd_russian_currency" id="input-currency" class="form-control">
+										{% for currency in currencies %}
+										{% if currency.code == shipping_dpd_russian_currency %}
+										<option value="{{ currency.code }}" selected="selected">{{ currency.title }}</option>
+										{% else %}
+										<option value="{{ currency.code }}">{{ currency.title }}</option>
+										{% endif %}
+										{% endfor %}
+									</select>
+								</div>
+								</div>
+							</div>
+							<div class="tab-pane" id="tab-kazahstan">
+								{{ text_auth_kazahstan }}
+								<div class="form-group required">
+									<div class="sh-flex">
+										<label class="col-sm-4 control-label"><span data-toggle="tooltip" title="{{ help_number }}">{{ entry_dpd_number }}</span></label>
+										<div class="col-sm-4">
+											<input type="text" name="shipping_dpd_kazahstan_number" value="{{ shipping_dpd_kazahstan_number }}" class="form-control">
+											{% if error_kazahstan_number %}
+											  <div class="text-danger">{{ error_kazahstan_number }}</div>
+											{% endif %}
+										</div>
+									</div>
+								</div>
+								<div class="form-group required">
+									<div class="sh-flex">
+										<label class="col-sm-4 control-label"><span data-toggle="tooltip" title="{{ help_auth }}">{{ entry_dpd_auth }}</span></label>
+										<div class="col-sm-4">
+											<input type="text" name="shipping_dpd_kazahstan_auth" value="{{ shipping_dpd_kazahstan_auth }}" class="form-control">
+											{% if error_kazahstan_auth %}
+											  <div class="text-danger">{{ error_kazahstan_auth }}</div>
+											{% endif %}
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+								<label class="col-sm-4 control-label" for="input-currency">{{ entry_currency }}</label>
+								<div class="col-sm-4">
+									<select name="shipping_dpd_kazahstan_currency" id="input-currency" class="form-control">
+										{% for currency in currencies %}
+										{% if currency.code == shipping_dpd_kazahstan_currency %}
+										<option value="{{ currency.code }}" selected="selected">{{ currency.title }}</option>
+										{% else %}
+										<option value="{{ currency.code }}">{{ currency.title }}</option>
+										{% endif %}
+										{% endfor %}
+									</select>
+									</div>
+								</div>
+							</div>
+							<div class="tab-pane" id="tab-belarus">
+								{{ text_auth_belarus }}
+								<div class="form-group required">
+									<div class="sh-flex">
+										<label class="col-sm-4 control-label"><span data-toggle="tooltip" title="{{ help_number }}">{{ entry_dpd_number }}</span></label>
+										<div class="col-sm-4">
+											<input type="text" name="shipping_dpd_belarus_number" value="{{ shipping_dpd_belarus_number }}" class="form-control">
+											{% if error_belarus_number %}
+											  <div class="text-danger">{{ error_belarus_number }}</div>
+											{% endif %}
+										</div>
+									</div>
+								</div>
+								<div class="form-group required">
+									<div class="sh-flex">
+										<label class="col-sm-4 control-label"><span data-toggle="tooltip" title="{{ help_auth }}">{{ entry_dpd_auth }}</span></label>
+										<div class="col-sm-4">
+											<input type="text" name="shipping_dpd_belarus_auth" value="{{ shipping_dpd_belarus_auth }}" class="form-control">
+											{% if error_belarus_auth %}
+											  <div class="text-danger">{{ error_belarus_auth }}</div>
+											{% endif %}
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-4 control-label" for="input-currency">{{ entry_currency }}</label>
+									<div class="col-sm-4">
+									<select name="shipping_dpd_belarus_currency" id="input-currency" class="form-control">
+										{% for currency in currencies %}
+										{% if currency.code == shipping_dpd_belarus_currency %}
+										<option value="{{ currency.code }}" selected="selected">{{ currency.title }}</option>
+										{% else %}
+										<option value="{{ currency.code }}">{{ currency.title }}</option>
+										{% endif %}
+										{% endfor %}
+									</select>
+									</div>
+								</div>
+							</div>
+						</div>
+						</br>
+						<hr></hr>
+						<div class="form-group">
+							<label class="col-sm-4 control-label" for="input-account-default"><span data-toggle="tooltip" title="{{ help_account_default }}">{{ entry_account_default }}</span></label>
+							<div class="col-sm-4">
+								<select name="shipping_dpd_account_default" id="input-account-default" class="form-control">
+									{% for country in country_with_dpd %}
+									{% if country.value == shipping_dpd_account_default %}
+									<option value="{{ country.value }}" selected="selected">{{ country.name }}</option>
+									{% else %}
+									<option value="{{ country.value }}">{{ country.name }}</option>
+									{% endif %}
+									{% endfor %}
+								</select>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-4 control-label" for="input-test"><span data-toggle="tooltip" title="{{ help_test }}">{{ entry_test }}</span></label>
+							<div class="col-sm-4">
+								<div class="checkbox">
+									<label> {% if shipping_dpd_test %}
+									<input type="checkbox" id="input-test" name="shipping_dpd_test" checked="checked" />
+									{% else %}
+									<input type="checkbox" id="input-test" name="shipping_dpd_test" />
+									{% endif %} </label>
+								</div>
+							</div>
+					   </div>
+					   <div class="form-group">
+							<label class="col-sm-4 control-label" for="input-dpd-button">{{ entry_dpd_button }}</label>
+							<div class="col-sm-4">
+								<select name="shipping_dpd_button" id="input-dpd-button" class="form-control">
+									{% for button in buttons_with_dpd %}
+									{% if button.value == shipping_dpd_button %}
+									<option value="{{ button.value }}" selected="selected">{{ button.name }}</option>
+									{% else %}
+									<option value="{{ button.value }}">{{ button.name }}</option>
+									{% endif %}
+									{% endfor %}
+								</select>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-4 control-label" for="input-pvz">{{ entry_pvz }}</label>
+							<div class="col-sm-4">
+								<div class="checkbox">
+									<label> {% if shipping_dpd_pvz %}
+									<input type="checkbox" id="input-pvz" name="shipping_dpd_pvz" checked="checked" />
+									{% else %}
+									<input type="checkbox" id="input-pvz" name="shipping_dpd_pvz" />
+									{% endif %} </label>
+								</div>
+							</div>
+					   </div>
+					   <div class="form-group">
+						 	<label class="col-sm-4 control-label" for="input-api-map"><span data-toggle="tooltip" title="{{ help_api_map }}">{{ entry_api_map }}</span></label>
+							<div class="col-sm-4">
+								<div class="checkbox">
+									<label> {% if shipping_dpd_api_map %}
+									<input type="checkbox" id="input-api-map" name="shipping_dpd_api_map" checked="checked" />
+									{% else %}
+									<input type="checkbox" id="input-api-map" name="shipping_dpd_api_map" />
+									{% endif %} </label>
+								</div>
+							</div>
+					   </div>
+					  </div>
+					  <div class="tab-pane" id="tab-dimensions">
+						<div class="alert alert-warning" style="color:black;"  role="alert">
+							{{ text_dimensions }}
+							</br>
+							</br>
+							<b>{{ text_dimensions_heading1 }}</b>
+							</br>
+							{{ text_dimensions_center }}
+							</br>
+							</br>
+							<b>{{ text_dimensions_heading2 }}</b>
+							</br>
+							{{ text_dimensions_end1 }}
+							</br>
+							</br>
+							<b class="text-danger">{{ text_dimensions_warning }}</b>
+							{{ text_dimensions_end2 }}
+					    </div>
+						<div class="form-group">
+							<label class="col-sm-4 control-label" for="input-use-for">{{ entry_use_for }}</label>
+							<div class="col-sm-4">
+								<select name="shipping_dpd_use_for" id="input-use-for" class="form-control">
+									{% for use in use_for %}
+									{% if use.value == shipping_dpd_use_for %}
+									<option value="{{ use.value }}" selected="selected">{{ use.name }}</option>
+									{% else %}
+									<option value="{{ use.value }}">{{ use.name }}</option>
+									{% endif %}
+									{% endfor %}
+								</select>
+							</div>
+						</div>
+						<div class="form-group required">
+							<div class="sh-flex">
+								<label class="col-sm-4 control-label">{{ entry_weight }}</label>
+								<div class="col-sm-4">
+									<input type="text" name="shipping_dpd_weight" value="{{ shipping_dpd_weight }}" class="form-control">
+									{% if error_weight %}
+									  <div class="text-danger">{{ error_weight }}</div>
+									{% endif %}
+								</div>
+							</div>
+						</div>
+						<div class="form-group required">
+							<div class="sh-flex">
+								<label class="col-sm-4 control-label">{{ entry_length }}</label>
+								<div class="col-sm-4">
+									<input type="text" name="shipping_dpd_length" value="{{ shipping_dpd_length }}" class="form-control">
+									{% if error_length %}
+									  <div class="text-danger">{{ error_length }}</div>
+									{% endif %}
+								</div>
+							</div>
+						</div>
+						<div class="form-group required">
+							<div class="sh-flex">
+								<label class="col-sm-4 control-label">{{ entry_width }}</label>
+								<div class="col-sm-4">
+									<input type="text" name="shipping_dpd_width" value="{{ shipping_dpd_width }}" class="form-control">
+									{% if error_width %}
+									  <div class="text-danger">{{ error_width }}</div>
+									{% endif %}
+								</div>
+							</div>
+						</div>
+						<div class="form-group required">
+							<div class="sh-flex">
+								<label class="col-sm-4 control-label">{{ entry_height }}</label>
+								<div class="col-sm-4">
+									<input type="text" name="shipping_dpd_height" value="{{ shipping_dpd_height }}" class="form-control">
+									{% if error_height %}
+									  <div class="text-danger">{{ error_height }}</div>
+									{% endif %}
+								</div>
+							</div>
+						</div>
+					  </div>
+					  <div class="tab-pane" id="tab-calculate-shipping">
+					  <div class="form-group">
+						<label class="col-sm-4 control-label" for="not-calculate">{{ entry_not_calculate }}</label>
+						<div class="col-sm-3">
+							<select name="shipping_dpd_not_calculate[]" multiple class="form-control" id="calculate">
+							  <option></option>
+							  {% for not_calculate in not_calculate_dpd %}
+								{% if not_calculate.value == attribute(_context, 'shipping_dpd_not_calculate' ~ not_calculate.value) %}
+								<option value="{{ not_calculate.value }}" selected="selected">{{ not_calculate.name }}</option>
+								{% else %}
+								<option value="{{ not_calculate.value }}">{{ not_calculate.name }}</option>
+								{% endif %}
+							  {% endfor %}
+							</select>
+						</div>
+					  </div>
+					  <div class="form-group">
+						<label class="col-sm-4 control-label" for="not-calculate"><span data-toggle="tooltip" title="{{ help_tariff }}">{{ entry_tariff_default }}</span></label>
+						<div class="col-sm-4">
+							<select name="shipping_dpd_tariff_default" class="form-control" id="calculate">
+							  <option></option>
+							  {% for not_calculate in not_calculate_dpd %}
+								{% if not_calculate.value == shipping_dpd_tariff_default %}
+								<option value="{{ not_calculate.value }}" selected="selected">{{ not_calculate.name }}</option>
+								{% else %}
+								<option value="{{ not_calculate.value }}">{{ not_calculate.name }}</option>
+								{% endif %}
+							  {% endfor %}
+							</select>
+						</div>
+					  </div>
+					  <div class="form-group">
+						<div class="sh-flex">
+							<label class="col-sm-4 control-label">{{ entry_max_for_default }}</label>
+							<div class="col-sm-4">
+								<input type="text" name="shipping_dpd_max_for_default" value="{{ shipping_dpd_max_for_default }}" class="form-control">
+							</div>
+						</div>
+					  </div>
+					  <div class="form-group">
+						<div class="sh-flex">
+							<label class="col-sm-4 control-label" for="input-cart-q-product"><span data-toggle="tooltip" title="{{ help_cart_equally_product }}">{{ entry_cart_equally_product }}</span></label>
+							<div class="col-sm-4">
+								<div class="checkbox">
+									<label> {% if shipping_dpd_cart_equally_product %}
+									<input type="checkbox" id="input-cart-q-product" name="shipping_dpd_cart_equally_product" checked="checked" />
+									{% else %}
+									<input type="checkbox" id="input-cart-q-product" name="shipping_dpd_cart_equally_product" />
+									{% endif %} </label>
+								</div>
+							</div>
+						</div>
+					  </div>
+					  <div class="form-group">
+						<div class="sh-flex">
+							<label class="col-sm-4 control-label" for="input-calculate-for-product"><span data-toggle="tooltip" title="{{ help_calculate_for_product }}">{{ entry_calculate_for_product }}</span></label>
+							<div class="col-sm-4">
+								<div class="checkbox">
+									<label> {% if shipping_dpd_calculate_for_product %}
+									<input type="checkbox" id="input-calculate-for-product" name="shipping_dpd_calculate_for_product" checked="checked" />
+									{% else %}
+									<input type="checkbox" id="input-calculate-for-product" name="shipping_dpd_calculate_for_product" />
+									{% endif %} </label>
+								</div>
+							</div>
+						</div>
+					  </div>
+					  <div class="form-group">
+						<div class="sh-flex">
+							<label class="col-sm-4 control-label"><span data-toggle="tooltip" title="{{ help_ceil }}">{{ entry_ceil }}</span></label>
+							<div class="col-sm-4">
+								<input type="number" name="shipping_dpd_ceil" value="{{ shipping_dpd_ceil }}" class="form-control">
+							</div>
+						</div>
+					  </div>
+					  <div class="form-group">
+						<div class="sh-flex">
+							<label class="col-sm-4 control-label">{{ entry_term_shipping }}</label>
+							<div class="col-sm-4">
+								<input type="number" name="shipping_dpd_term_shipping" value="{{ shipping_dpd_term_shipping }}" class="form-control">
+							</div>
+						</div>
+					  </div>
+					  <div class="alert alert-info" align="center" role="alert">
+						{{ entry_h_comission }}
+					  </div>
+					  <div class="alert alert-warning" style="color:black;" role="alert">
+						{{ entry_h_comission_info }}
+					  </div>
+					  <ul class="nav nav-tabs">
+					  {% for group in customer_groups %}
+						{% if minimum_customer_id == group.customer_group_id %}
+						<li class="active"><a href="#tab-{{ group.customer_group_id }}" data-toggle="tab">{{ group.name }}</a></li>
+						{% else %}
+						<li><a href="#tab-{{ group.customer_group_id }}" data-toggle="tab">{{ group.name }}</a></li>
+						{% endif %}
+					  {% endfor %}
+					  </ul>
+					  <div class="tab-content">
+					   {% for group in customer_groups %}
+						{% if minimum_customer_id == group.customer_group_id %}
+						<div class="tab-pane active" id="tab-{{ group.customer_group_id }}">
+						<div class="form-group">
+							<div class="sh-flex">
+								<label class="col-sm-4 control-label" for="input-comission-for-collection{{ group.customer_group_id }}">{{ entry_comission_for_collection }}</span></label>
+								<div class="col-sm-4">
+									<div class="checkbox">
+										<label> {% if attribute(_context, 'shipping_dpd_comission_for_collection_' ~ group.customer_group_id) %}
+										<input type="checkbox" id="input-comission-for-collection{{ group.customer_group_id }}" name="shipping_dpd_comission_for_collection_{{group.customer_group_id}}" checked="checked" />
+										{% else %}
+										<input type="checkbox" id="input-comission-for-collection{{ group.customer_group_id }}" name="shipping_dpd_comission_for_collection_{{group.customer_group_id}}" />
+										{% endif %} </label>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="form-group">
+						<div class="sh-flex">
+							<label class="col-sm-4 control-label">{{ entry_comission_for_product }}</label>
+							<div class="col-sm-4">
+								<input type="number" name="shipping_dpd_comission_for_product_{{ group.customer_group_id }}" value="{{ attribute(_context, 'shipping_dpd_comission_for_product_' ~ group.customer_group_id) }}" class="form-control">
+							</div>
+						</div>
+						</div>
+						<div class="form-group">
+						<div class="sh-flex">
+							<label class="col-sm-4 control-label">{{ entry_min_sum_comission }}</label>
+							<div class="col-sm-4">
+								<input type="text" name="shipping_dpd_min_sum_comission_{{ group.customer_group_id }}" value="{{ attribute(_context, 'shipping_dpd_min_sum_comission_' ~ group.customer_group_id) }}" class="form-control">
+							</div>
+						</div>
+						</div>
+						<div class="form-group">
+						<label class="col-sm-4 control-label" for="binding-payment-{{ group.customer_group_id }}">{{ entry_bind_payment }}</label>
+						<div class="col-sm-3">
+							<select name="shipping_dpd_bind_payment_{{ group.customer_group_id }}[]" multiple class="form-control" id="binding-payment-{{ group.customer_group_id }}">
+								<option></option>
+								{% for payment in payment_methods %}
+								{% if payment.code == attribute(_context, 'shipping_dpd_bind_payment_' ~ group.customer_group_id ~ payment.code) %}
+								<option value="{{ payment.code }}" selected="selected">{{ payment.title }}</option>
+								{% else %}
+								<option value="{{ payment.code }}">{{ payment.title }}</option>
+								{% endif %}
+							  {% endfor %}
+							</select>
+						</div>
+						</div>
+						<div class="form-group">
+							<div class="sh-flex">
+								<label class="col-sm-4 control-label" for="input-not-payment{{ group.customer_group_id }}"><span data-toggle="tooltip" title="{{ help_not_payment }}">{{ entry_not_payment }}</span></label>
+								<div class="col-sm-4">
+									<div class="checkbox">
+										<label> {% if attribute(_context, 'shipping_dpd_not_payment_' ~ group.customer_group_id) %}
+										<input type="checkbox" id="input-not-payment{{ group.customer_group_id }}" name="shipping_dpd_not_payment_{{group.customer_group_id}}" checked="checked" />
+										{% else %}
+										<input type="checkbox" id="input-not-payment{{ group.customer_group_id }}" name="shipping_dpd_not_payment_{{group.customer_group_id}}" />
+										{% endif %} </label>
+									</div>
+								</div>
+							</div>
+						</div>
+						</div>
+						{% else %}
+						<div class="tab-pane" id="tab-{{ group.customer_group_id }}">
+						<div class="form-group">
+							<div class="sh-flex">
+								<label class="col-sm-4 control-label" for="input-comission-for-collection{{ group.customer_group_id }}">{{ entry_comission_for_collection }}</span></label>
+								<div class="col-sm-4">
+									<div class="checkbox">
+										<label> {% if attribute(_context, 'shipping_dpd_comission_for_collection_' ~ group.customer_group_id) %}
+										<input type="checkbox" id="input-comission-for-collection{{ group.customer_group_id }}" name="shipping_dpd_comission_for_collection_{{group.customer_group_id}}" checked="checked" />
+										{% else %}
+										<input type="checkbox" id="input-comission-for-collection{{ group.customer_group_id }}" name="shipping_dpd_comission_for_collection_{{group.customer_group_id}}" />
+										{% endif %} </label>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="form-group">
+						<div class="sh-flex">
+							<label class="col-sm-4 control-label">{{ entry_comission_for_product }}</label>
+							<div class="col-sm-4">
+								<input type="number" name="shipping_dpd_comission_for_product_{{ group.customer_group_id }}" value="{{ attribute(_context, 'shipping_dpd_comission_for_product_' ~ group.customer_group_id) }}" class="form-control">
+							</div>
+						</div>
+						</div>
+						<div class="form-group">
+						<div class="sh-flex">
+							<label class="col-sm-4 control-label">{{ entry_min_sum_comission }}</label>
+							<div class="col-sm-4">
+								<input type="text" name="shipping_dpd_min_sum_comission_{{ group.customer_group_id }}" value="{{ attribute(_context, 'shipping_dpd_min_sum_comission_' ~ group.customer_group_id) }}" class="form-control">
+							</div>
+						</div>
+						</div>
+						<div class="form-group">
+						<label class="col-sm-4 control-label" for="binding-payment-{{ group.customer_group_id }}">{{ entry_bind_payment }}</label>
+						<div class="col-sm-3">
+							<select name="shipping_dpd_bind_payment_{{ group.customer_group_id }}" multiple class="form-control" id="binding-payment-{{ group.customer_group_id }}">
+							  <option></option>
+							  {% for payment in payment_methods %}
+								{% if payment.code == attribute(_context, 'shipping_dpd_bind_payment_' ~ group.customer_group_id) %}
+								<option value="{{ payment.code }}" selected="selected">{{ payment.title }}</option>
+								{% else %}
+								<option value="{{ payment.code }}">{{ payment.title }}</option>
+								{% endif %}
+							  {% endfor %}
+							</select>
+						</div>
+						</div>
+						<div class="form-group">
+							<div class="sh-flex">
+								<label class="col-sm-4 control-label" for="input-not-payment{{ group.customer_group_id }}"><span data-toggle="tooltip" title="{{ help_not_payment }}">{{ entry_not_payment }}</span></label>
+								<div class="col-sm-4">
+									<div class="checkbox">
+										<label> {% if attribute(_context, 'shipping_dpd_not_payment_' ~ group.customer_group_id) %}
+										<input type="checkbox" id="input-not-payment{{ group.customer_group_id }}" name="shipping_dpd_not_payment_{{group.customer_group_id}}" checked="checked" />
+										{% else %}
+										<input type="checkbox" id="input-not-payment{{ group.customer_group_id }}" name="shipping_dpd_not_payment_{{group.customer_group_id}}" />
+										{% endif %} </label>
+									</div>
+								</div>
+							</div>
+						</div>
+						</div>
+						{% endif %}
+					  {% endfor %}
+					 </div>
+					</div>
+					<div class="tab-pane" id="tab-sender">
+						<div class="form-group required">
+							<div class="sh-flex">
+								<label class="col-sm-4 control-label"><span data-toggle="tooltip" title="{{ help_contact_face }}">{{ entry_contact_face }}</span></label>
+								<div class="col-sm-4">
+									<input type="text" name="shipping_dpd_contact_face" value="{{ shipping_dpd_contact_face }}" class="form-control">
+								</div>
+							</div>
+						</div>
+						<div class="form-group required">
+							<div class="sh-flex">
+								<label class="col-sm-4 control-label"><span data-toggle="tooltip" title="{{ help_name_company }}">{{ entry_name_company }}</span></label>
+								<div class="col-sm-4">
+									<input type="text" name="shipping_dpd_name_company" value="{{ shipping_dpd_name_company }}" class="form-control">
+								</div>
+							</div>
+						</div>
+						<div class="form-group required">
+							<div class="sh-flex">
+								<label class="col-sm-4 control-label">{{ entry_phone_sender }}</label>
+								<div class="col-sm-4">
+									<input type="text" name="shipping_dpd_phone_sender" value="{{ shipping_dpd_phone_sender }}" class="form-control">
+								</div>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="sh-flex">
+								<label class="col-sm-4 control-label">{{ entry_email_sender }}</label>
+								<div class="col-sm-4">
+									<input type="text" name="shipping_dpd_email_sender" value="{{ shipping_dpd_email_sender }}" class="form-control">
+								</div>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="sh-flex">
+								<label class="col-sm-4 control-label">{{ entry_numb_r_sender }}</label>
+								<div class="col-sm-4">
+									<input type="text" name="shipping_dpd_numb_r_sender" value="{{ shipping_dpd_numb_r_sender }}" class="form-control">
+								</div>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="sh-flex">
+								<label class="col-sm-4 control-label" for="input-pass">{{ entry_pass }}</label>
+								<div class="col-sm-4">
+									<div class="checkbox">
+										<label> {% if shipping_dpd_pass %}
+										<input type="checkbox" id="input-pass" name="shipping_dpd_pass" checked="checked" />
+										{% else %}
+										<input type="checkbox" id="input-pass" name="shipping_dpd_pass" />
+										{% endif %} </label>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="alert alert-info" align="center" role="alert">
+						{{ entry_h_address }}
+						</div>
+						<div class="form-group">
+							<div class="sh-flex">
+								<label class="col-sm-4 control-label"><span data-toggle="tooltip" title="{{ help_city_sender }}">{{ entry_city_sender }}</span></label>
+								<div class="col-sm-8">
+									<input type="text" name="shipping_dpd_city_sender" value="{{ shipping_dpd_city_sender }}" placeholder="{{ entry_city_sender }}" class="form-control">
+									<input type="hidden" name="shipping_dpd_city_id" value="{{ shipping_dpd_city_id }}" />
+								</div>
+							</div>
+						</div>
+						<ul class="nav nav-tabs">
+						  <li class="active"><a href="#tab-door" data-toggle="tab">{{ tab_door }}</a></li>
+						  <li><a href="#tab-terminal" data-toggle="tab">{{ tab_terminal }}</a></li>
+						</ul>
+						<div class="tab-content">
+							<div class="tab-pane active" id="tab-door">
+							<h4>{{ text_h1_door }}</h4>
+							<div class="form-group">
+								<div class="sh-flex">
+									<label class="col-sm-4 control-label">{{ entry_street_sender }}</label>
+									<div class="col-sm-4">
+										<input type="text" name="shipping_dpd_street_sender" value="{{ shipping_dpd_street_sender }}" class="form-control">
+									</div>
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="sh-flex">
+									<label class="col-sm-4 control-label"><span data-toggle="tooltip" title="{{ help_ab_street_sender }}">{{ entry_ab_street_sender }}</label>
+									<div class="col-sm-4">
+										<input type="text" name="shipping_dpd_ab_street_sender" value="{{ shipping_dpd_ab_street_sender }}" class="form-control">
+									</div>
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="sh-flex">
+									<label class="col-sm-4 control-label">{{ entry_house_sender }}</label>
+									<div class="col-sm-4">
+										<input type="text" name="shipping_dpd_house_sender" value="{{ shipping_dpd_house_sender }}" class="form-control">
+									</div>
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="sh-flex">
+									<label class="col-sm-4 control-label">{{ entry_corp_sender }}</label>
+									<div class="col-sm-4">
+										<input type="text" name="shipping_dpd_corp_sender" value="{{ shipping_dpd_corp_sender }}" class="form-control">
+									</div>
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="sh-flex">
+									<label class="col-sm-4 control-label">{{ entry_structure_sender }}</label>
+									<div class="col-sm-4">
+										<input type="text" name="shipping_dpd_structure_sender" value="{{ shipping_dpd_structure_sender }}" class="form-control">
+									</div>
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="sh-flex">
+									<label class="col-sm-4 control-label">{{ entry_poss_sender }}</label>
+									<div class="col-sm-4">
+										<input type="text" name="shipping_dpd_poss_sender" value="{{ shipping_dpd_poss_sender }}" class="form-control">
+									</div>
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="sh-flex">
+									<label class="col-sm-4 control-label">{{ entry_office_sender }}</label>
+									<div class="col-sm-4">
+										<input type="text" name="shipping_dpd_office_sender" value="{{ shipping_dpd_office_sender }}" class="form-control">
+									</div>
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="sh-flex">
+									<label class="col-sm-4 control-label">{{ entry_apart_sender }}</label>
+									<div class="col-sm-4">
+										<input type="text" name="shipping_dpd_apart_sender" value="{{ shipping_dpd_apart_sender }}" class="form-control">
+									</div>
+								</div>
+							</div>
+							</div>
+							<div class="tab-pane" id="tab-terminal">
+							<h4>{{ text_h1_terminal }}</h4>
+							<div class="form-group">
+							<label class="col-sm-4 control-label" for="terminal-sender">{{ entry_terminal_sender }}</label>
+							<div class="col-sm-3">
+								<select name="shipping_dpd_terminal_sender" class="form-control" id="terminal-sender">
+								  {% for terminal in terminals %}
+									{% if terminal.CODE == shipping_dpd_terminal_sender %}
+									<option value="{{ terminal.CODE }}" selected="selected">{{ terminal.NAME }}</option>
+									{% else %}
+									<option value="{{ terminal.CODE }}">{{ terminal.NAME }}</option>
+									{% endif %}
+								  {% endfor %}
+								</select>
+							</div>
+							</div>
+							</div>
+						</div>
+					</div>
+					<div class="tab-pane" id="tab-recipient">
+						<div class="form-group">
+							<div class="sh-flex">
+								<label class="col-sm-4 control-label" for="input-pass-rec">{{ entry_pass }}</label>
+								<div class="col-sm-4">
+									<div class="checkbox">
+										<label> {% if shipping_dpd_pass_rec %}
+										<input type="checkbox" id="input-pass-rec" name="shipping_dpd_pass_rec" checked="checked" />
+										{% else %}
+										<input type="checkbox" id="input-pass-rec" name="shipping_dpd_pass_rec" />
+										{% endif %} </label>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="tab-pane" id="tab-desc-sender">
+					<div class="form-group">
+						<label class="col-sm-4 control-label" for="input-departure-method"><span data-toggle="tooltip" title="{{ help_departure_method }}">{{ entry_departure_method }}</span></label>
+						<div class="col-sm-4">
+							<select name="shipping_dpd_departure_method" id="input-departure-method" class="form-control">
+								{% for method in departure_method %}
+								{% if method.value == shipping_dpd_departure_method %}
+								<option value="{{ method.value }}" selected="selected">{{ method.name }}</option>
+								{% else %}
+								<option value="{{ method.value }}">{{ method.name }}</option>
+								{% endif %}
+								{% endfor %}
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-4 control-label" for="input-payment-method-delivery">{{ entry_payment_method_delivery }}</label>
+						<div class="col-sm-4">
+							<select name="shipping_dpd_payment_method_delivery" id="input-payment-method-delivery" class="form-control">
+								{% for payment_method in payment_method_delivery %}
+								{% if payment_method.value == shipping_dpd_payment_method_delivery %}
+								<option value="{{ payment_method.value }}" selected="selected">{{ payment_method.name }}</option>
+								{% else %}
+								<option value="{{ payment_method.value }}">{{ payment_method.name }}</option>
+								{% endif %}
+								{% endfor %}
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-4 control-label" for="input-dpd-transit-interval">{{ entry_dpd_transit_interval }}</label>
+						<div class="col-sm-4">
+							<select name="shipping_dpd_transit_interval_dpd" id="input-dpd-transit-interval" class="form-control">
+								{% for dpd in dpd_transit_interval %}
+								{% if dpd.value == shipping_dpd_transit_interval_dpd %}
+								<option value="{{ dpd.value }}" selected="selected">{{ dpd.name }}</option>
+								{% else %}
+								<option value="{{ dpd.value }}">{{ dpd.name }}</option>
+								{% endif %}
+								{% endfor %}
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-4 control-label" for="input-delivery-time-interval">{{ entry_delivery_time_interval }}</label>
+						<div class="col-sm-4">
+							<select name="shipping_dpd_delivery_time_interval" id="input-delivery-time-interval" class="form-control">
+								{% for delivery in delivery_time_interval %}
+								{% if delivery.value == shipping_dpd_delivery_time_interval %}
+								<option value="{{ delivery.value }}" selected="selected">{{ delivery.name }}</option>
+								{% else %}
+								<option value="{{ delivery.value }}">{{ delivery.name }}</option>
+								{% endif %}
+								{% endfor %}
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="sh-flex">
+							<label class="col-sm-4 control-label">{{ entry_quantity_places }}</label>
+							<div class="col-sm-4">
+								<input type="number" name="shipping_dpd_quantity_places" value="{{ shipping_dpd_quantity_places }}" class="form-control">
+							</div>
+						</div>
+					</div>
+					<div class="form-group required">
+						<div class="sh-flex">
+							<label class="col-sm-4 control-label">{{ entry_content_sender }}</label>
+							<div class="col-sm-4">
+								<input type="text" name="shipping_dpd_content_sender" value="{{ shipping_dpd_content_sender }}" class="form-control">
+								{% if error_content %}
+								  <div class="text-danger">{{ error_content }}</div>
+								{% endif %}
+							</div>
+						</div>
+					</div>
+					<div class="alert alert-info" align="center" role="alert">
+						{{ entry_h_options }}
+					</div>
+					<div class="alert alert-warning" style="color:black;" role="alert">
+						{{ entry_desc_sender_desc }}
+					</div>
+					<div class="form-group">
+						<label class="col-sm-4 control-label" for="input-val-cargo"><span data-toggle="tooltip" title="{{ help_val_cargo }}">{{ entry_val_cargo }}</span></label>
+						<div class="col-sm-4">
+							<div class="checkbox">
+								<label> {% if shipping_dpd_val_cargo %}
+								<input type="checkbox" id="input-val-cargo" name="shipping_dpd_val_cargo" checked="checked" />
+								{% else %}
+								<input type="checkbox" id="input-val-cargo" name="shipping_dpd_val_cargo" />
+								{% endif %} </label>
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-4 control-label" for="input-weekend-delivery"><span data-toggle="tooltip" title="{{ help_weekend_delivery }}">{{ entry_weekend_delivery }}</span></label>
+						<div class="col-sm-5">
+							<div class="checkbox">
+								<label> {% if shipping_dpd_weekend_delivery %}
+								<input type="checkbox" id="input-weekend-delivery" name="shipping_dpd_weekend_delivery" checked="checked" />
+								{% else %}
+								<input type="checkbox" id="input-weekend-delivery" name="shipping_dpd_weekend_delivery" />
+								{% endif %} </label>
+								<div class="text-danger">{{ warning_weekend_delivery }}</div>
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-4 control-label" for="input-condition">{{ entry_condition }}</label>
+						<div class="col-sm-5">
+							<div class="checkbox">
+								<label> {% if shipping_dpd_condition %}
+								<input type="checkbox" id="input-condition" name="shipping_dpd_condition" checked="checked" />
+								{% else %}
+								<input type="checkbox" id="input-condition" name="shipping_dpd_condition" />
+								{% endif %} </label>
+								<div class="text-danger">{{ warning_weekend_delivery }}</div>
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-4 control-label" for="input-loading-unloading"><span data-toggle="tooltip" title="{{ help_loading_unloading  }}">{{ entry_loading_unloading }}</span></label>
+						<div class="col-sm-5">
+							<div class="checkbox">
+								<label> {% if shipping_dpd_loading_unloading %}
+								<input type="checkbox" id="input-loading-unloading" name="shipping_dpd_loading_unloading" checked="checked" />
+								{% else %}
+								<input type="checkbox" id="input-loading-unloading" name="shipping_dpd_loading_unloading" />
+								{% endif %} </label>
+								<div class="text-danger">{{ warning_weekend_delivery }}</div>
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-4 control-label" for="input-return-doc"><span data-toggle="tooltip" title="{{ help_return_doc  }}">{{ entry_return_doc }}</span></label>
+						<div class="col-sm-5">
+							<div class="checkbox">
+								<label> {% if shipping_dpd_return_doc %}
+								<input type="checkbox" id="input-return-doc" name="shipping_dpd_return_doc" checked="checked" />
+								{% else %}
+								<input type="checkbox" id="input-return-doc" name="shipping_dpd_return_doc" />
+								{% endif %} </label>
+								<div class="text-danger">{{ warning_weekend_delivery }}</div>
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-4 control-label" for="input-wait-address">{{ entry_wait_address }}</label>
+						<div class="col-sm-4">
+							<select name="shipping_dpd_wait_address" id="input-wait-address" class="form-control">
+								{% for waiting in waiting_address %}
+								{% if waiting.value == shipping_dpd_wait_address %}
+								<option value="{{ waiting.value }}" selected="selected">{{ waiting.name }}</option>
+								{% else %}
+								<option value="{{ waiting.value }}">{{ waiting.name }}</option>
+								{% endif %}
+								{% endfor %}
+							</select>
+						</div>
+					</div>
+					<div class="alert alert-info" align="center" role="alert">
+						{{ entry_h_alert }}
+					</div>
+					<div class="form-group">
+						<div class="sh-flex">
+							<label class="col-sm-4 control-label"><span data-toggle="tooltip" title="{{ help_order_mail  }}">{{ entry_order_mail }}</span></label>
+							<div class="col-sm-4">
+								<input type="text" name="shipping_dpd_order_mail" value="{{ shipping_dpd_order_mail }}" class="form-control">
+							</div>
+						</div>
+					</div>
+					</div>
+					<div class="tab-pane" id="tab-status">
+						<div class="alert alert-warning" style="color:black;" role="alert">
+							{{ text_status_info }}
+						</div>
+						<div class="form-group">
+							<div class="sh-flex">
+								<label class="col-sm-4 control-label" for="input-set-accepted">{{ entry_set_accepted }}</label>
+								<div class="col-sm-4">
+									<div class="checkbox">
+										<label> {% if shipping_dpd_set_accepted %}
+										<input type="checkbox" id="input-set-accepted" name="shipping_dpd_set_accepted" checked="checked" />
+										{% else %}
+										<input type="checkbox" id="input-set-accepted" name="shipping_dpd_set_accepted" />
+										{% endif %} </label>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="sh-flex">
+								<label class="col-sm-4 control-label" for="input-mark-paid"><span data-toggle="tooltip" title="{{ help_mark_delivery_paid  }}">{{ entry_mark_delivery_paid }}</span></label>
+								<div class="col-sm-4">
+									<div class="checkbox">
+										<label> {% if shipping_dpd_mark_delivery_paid %}
+										<input type="checkbox" id="input-mark-paid" name="shipping_dpd_mark_delivery_paid" checked="checked" />
+										{% else %}
+										<input type="checkbox" id="input-mark-paid" name="shipping_dpd_mark_delivery_paid" />
+										{% endif %} </label>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="sh-flex">
+								<label class="col-sm-4 control-label" for="input-track-status-dpd">{{ entry_track_status_dpd }}</label>
+								<div class="col-sm-4">
+									<div class="checkbox">
+										<label> {% if shipping_dpd_track_status_dpd %}
+										<input type="checkbox" id="input-track-status-dpd" name="shipping_dpd_track_status_dpd" checked="checked" />
+										{% else %}
+										<input type="checkbox" id="input-track-status-dpd" name="shipping_dpd_track_status_dpd" />
+										{% endif %} </label>
+									</div>
+								</div>
+							</div>
+						</div>
+						{% for dpd_status in dpd_statuses %}
+						<div class="form-group">
+							<label class="col-sm-4 control-label" for="input-status-{{ dpd_status.key }}">{{ dpd_status.entry }}</label>
+							<div class="col-sm-4">
+								<select name="shipping_dpd_status_{{ dpd_status.key }}" id="input-status-{{ dpd_status.key }}" class="form-control">
+									<option value="non">{{ text_non }}</option>
+									{% for status in order_statuses %}
+									{% if status.order_status_id == attribute(_context, 'shipping_dpd_status_' ~ dpd_status.key) %}
+									<option value="{{ status.order_status_id }}" selected="selected">{{ status.name }}</option>
+									{% else %}
+									<option value="{{ status.order_status_id }}">{{ status.name }}</option>
+									{% endif %}
+									{% endfor %}
+								</select>
+							</div>
+						</div>
+						{% endfor %}
+					</div>
+				</form>
+				</br>
+				<hr>
+				{% if filled %}
+				<h4><b>{{ text_service_procedures }}</b></h4>
+				   <ul class="nav nav-tabs">
+					<li class="active"><a href="#tab-service" value="1" id="test" data-toggle="tab">{{ tab_service }}</a></li>
+				   </ul>
+				   <div class="tab-content">
+					<div class="tab-pane active" id="tab-service">
+					<div class="form-group">
+						<div class="col-sm-3">
+							<button style="height:41px;" class="btn btn-success" id="import" type="button" onclick="importdata();" title="{{ entry_import }}">{{ entry_import }}</button>
+						</div>
+						<div class="col-sm-8">
+							<b id="hh"></b>
+							<div style="display:none;" id="loadimport" class="progress">
+							  <div id="progressbar1" class="progress-bar progress-bar-striped active" role="progressbar"
+							  aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width:0%">
+								0%
+							  </div>
+							</div>
+						</div>
+					</div>
+				  </div>
+				 </div>
+				{% endif %}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript" src="view/javascript/summernote/summernote.js"></script>
+<link href="view/javascript/summernote/summernote.css" rel="stylesheet" />
+<script type="text/javascript" src="view/javascript/summernote/summernote-image-attributes.js"></script> 
+<script type="text/javascript" src="view/javascript/summernote/opencart.js"></script> 
+<script type="text/javascript"><!--
+function matchregions(){
+	$('#matchregions').button('loading');
+	$.post('index.php?route=extension/shipping/dpd/matchRegions&user_token={{ user_token }}', { type: 'import' }).done(function(json) {
+		if(json.error){
+			alert(json.error);
+			$('#matchregions').button('reset');
+		}
+		
+		if (json.success) {
+			alert(json.success);
+			$('#matchregions').button('reset');
+		}
+	});
+}
+
+function loadingimport(max,success) {
+		success = parseInt(success);
+		var	time = (success/max)*5;
+		var loading = function() {
+			var progressbar = $('#progressbar1');
+			var value = progressbar.attr('aria-valuenow');
+			value = parseInt(value);
+			value += 1;
+			
+			
+			addValue = progressbar1.setAttribute('aria-valuenow', value);
+			document.getElementById('progressbar1').style.width = value + '%';
+								
+			$('#progressbar1').html(value + '%');
+			if (value == max) {
+				clearInterval(animate);
+			}
+			
+			if (value == 100) {
+				$.post('index.php?route=extension/shipping/dpd/unsetImport&user_token={{ user_token }}', { type: 'import' }).done(function(json) {
+					$('#import').button('reset');
+					loadimport.style.display = 'none';
+					$('#hh').html('<div class="alert alert-success alert-dismissible" align="center">Загрузка завершена!<button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+						
+					document.getElementById('progressbar1').style.width = '0%';
+					progressbar1.setAttribute('aria-valuenow', 0);
+					$('#progressbar1').html('0%');
+				});
+			}
+		};
+
+		var animate = setInterval(function() {
+			loading();
+		}, time);
+}
+
+/* Import data */
+function importdata() {
+var progressbar = $('#progressbar1');
+
+$.post('index.php?route=extension/shipping/dpd/unsetImport&user_token={{ user_token }}', { type: 'import' }).done(function(json) {});
+loadimport.style.display = 'block';
+$('#import').button('loading');
+	$('#hh').html('{{ text_step_1 }}');
+	loadingimport(5, 25000);
+	$.post('index.php?route=extension/shipping/dpd/loadAll&user_token={{ user_token }}', { type: 'import' }).done(function(json) {
+		if(json.error){
+			alert(json.error);
+			
+			$('#import').button('reset');
+			loadimport.style.display = 'none';
+			$('#hh').html('<div class="alert alert-danger alert-dismissible" align="center">' + json.error + '<button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+						
+			document.getElementById('progressbar1').style.width = '0%';
+			progressbar1.setAttribute('aria-valuenow', 0);
+			$('#progressbar1').html('0%');
+		}
+		if (json.success) {
+			loadingimport(5, 2);
+			loadingimport(25, json.success);
+			$.post('index.php?route=extension/shipping/dpd/loadCashPay&user_token={{ user_token }}', { type: 'import' }).done(function(json) {
+				if(json.error){
+					alert(json.error);
+					
+					$('#import').button('reset');
+					loadimport.style.display = 'none';
+					$('#hh').html('<div class="alert alert-danger alert-dismissible" align="center">' + json.error + '<button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+								
+					document.getElementById('progressbar1').style.width = '0%';
+					progressbar1.setAttribute('aria-valuenow', 0);
+					$('#progressbar1').html('0%');
+				}
+				if (json.success) {
+					$('#hh').html('{{ text_step_2 }}');
+					loadingimport(25, 2);
+					loadingimport(75, json.success);
+					$.post('index.php?route=extension/shipping/dpd/loadUnlimited&user_token={{ user_token }}', { type: 'import' }).done(function(json) {
+						if(json.error){
+							alert(json.error);
+							
+							$('#import').button('reset');
+							loadimport.style.display = 'none';
+							$('#hh').html('<div class="alert alert-danger alert-dismissible" align="center">' + json.error + '<button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+										
+							document.getElementById('progressbar1').style.width = '0%';
+							progressbar1.setAttribute('aria-valuenow', 0);
+							$('#progressbar1').html('0%');
+						}
+						if (json.success) {
+							$('#hh').html('{{ text_step_3 }}');
+							loadingimport(50, 2);
+							$.post('index.php?route=extension/shipping/dpd/loadLimited&user_token={{ user_token }}', { type: 'import' }).done(function(json) {
+								if(json.error){
+									alert(json.error);
+									
+									$('#import').button('reset');
+									loadimport.style.display = 'none';
+									$('#hh').html('<div class="alert alert-danger alert-dismissible" align="center">' + json.error + '<button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+												
+									document.getElementById('progressbar1').style.width = '0%';
+									progressbar1.setAttribute('aria-valuenow', 0);
+									$('#progressbar1').html('0%');
+								}
+								if (json.success) {
+									$('#hh').html('{{ text_step_4 }}');
+									loadingimport(100, json.success);
+								}
+							});
+						}
+					});
+				}
+			});
+		}
+	});
+}
+
+var xhr;
+// City Sender
+$('input[name=\'shipping_dpd_city_sender\']').autocomplete({
+	'delay': 0,
+	'source': function(request, response) {
+		var regex = new RegExp(request.term, 'i');
+		if(xhr){
+			xhr.abort();
+		}
+		
+		var fn = function(){
+			xhr = $.ajax({
+				url: 'index.php?route=extension/shipping/dpd/autocomplete&user_token={{ user_token }}&filter_name=' +  encodeURIComponent(request),
+				dataType: 'json',
+				success: function(json) {
+					json.unshift({
+						city_id: 0,
+						name: '{{ text_none }}'
+					});
+					
+					response($.map(json, function(item) {
+						if(regex.test(item.label)){
+							return {
+								label: item['name'],
+								value: item['city_id'],
+								val:   item['value'],
+							}
+						}
+					}));
+				},
+			});
+		};
+		var interval = setTimeout(fn, 400);
+	},
+	'minlength':2,
+	'select': function(item) {
+		$('input[name=\'shipping_dpd_city_sender\']').val(item['val']);
+		$('input[name=\'shipping_dpd_city_id\']').val(item['value']);
+	}
+});
+</script>
+{{ footer }} 

@@ -1,0 +1,8 @@
+LOCATION: 
+http://ws.dpd.ru:80/services/order2
+REQUEST : 
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="http://dpd.ru/ws/order2/2012-04-04"><SOAP-ENV:Body><ns1:getOrderStatus><orderStatus><auth><clientNumber>1113003408</clientNumber><clientKey>8BAAC80931B124BF3815B9C6FBE83AB7F4774716</clientKey></auth><order><orderNumberInternal>114810</orderNumberInternal></order></orderStatus></ns1:getOrderStatus></SOAP-ENV:Body></SOAP-ENV:Envelope>
+
+ANSWER  : 
+<?xml version='1.0' encoding='UTF-8'?><S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"><S:Body><ns2:getOrderStatusResponse xmlns:ns2="http://dpd.ru/ws/order2/2012-04-04"><return><orderNumberInternal>114810</orderNumberInternal><status>no-data-found</status><errorMessage>Данные не найдены</errorMessage></return></ns2:getOrderStatusResponse></S:Body></S:Envelope>

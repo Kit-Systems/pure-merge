@@ -26,7 +26,7 @@ $(document).ready(function() {
 	
 	
 	
-	
+
 	
 	$(document).on('change', '#input-shipping-zone', function(){
 		
@@ -43,6 +43,8 @@ $(document).ready(function() {
 		}
 		if($('#input-shipping-country').val() == 109)
 		{
+			$('#shipping-city-selector').html('');
+			$('#shipping-city-selector').html('<select name="city"  id="input-shipping-city" class="form-control"><option>Нет данных</option></select>');
 			console.log('Country - Kazakhstan');
 			var t = 'shipping';
 			$.ajax({
@@ -82,14 +84,18 @@ $(document).ready(function() {
 			
 			
 			
+		} else {
+			$('#shipping-city-selector').html('');
+			$('#shipping-city-selector').html('<input type="text" name="city" value="" placeholder="{{ entry_city }}" id="input-shipping-city" class="form-control" />');
 		}
 		
 	});
+
 	$(document).on('change', '#input-payment-zone', function(){
 		
 		
 		
-		if(!$(this).val()){
+		/*if(!$(this).val()){
 			setTimeout(function(){
 				
 				$('#input-payment-zone').change();
@@ -97,9 +103,12 @@ $(document).ready(function() {
 				
 			}, 1000);
 			return false;
-		}
+		}*/
 		if($('#input-payment-country').val() == 109)
 		{
+			$('#payment-city-selector').html('');
+			$('#payment-city-selector').html('<select name="city"  id="input-payment-city" class="form-control"><option>Нет данных</option></select>');
+			console.log('Kazakhstan');
 			var t = 'payment';
 			$.ajax({
 				url: 'index.php?route=checkout/checkout/country&cities=' + $(this).val() + '&t=' + t,
@@ -138,6 +147,9 @@ $(document).ready(function() {
 			
 			
 			
+		} else {
+			$('#payment-city-selector').html('');
+			$('#payment-city-selector').html('<input type="text" name="city" value="" placeholder="{{ entry_city }}" id="input-payment-city" class="form-control" />');
 		}
 		
 	});
