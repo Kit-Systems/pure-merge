@@ -94,10 +94,18 @@ class ModelExtensionShippingXshipping extends Model {
 					$shipping_cost = 0;
 				}
 				if ($status) {
-				
+					// Не отображать Казахстанские города в международной доставке
+					$quote_title = '';
+
+					if ( strpos($shipping_xshipping_methods['name'.$i], 'Казахстан') ) {
+						$quote_title = $shipping_xshipping_methods['name'.$i] . ' ( ' . $title . ' )';
+					} else {
+						$quote_title = $shipping_xshipping_methods['name'.$i];
+					}
+
 					$quote_data['xshipping'.$i] = array(
 						'code'         => 'xshipping'.'.xshipping'.$i,
-						'title'        => 'Доставка по "'.$title.'"',//$shipping_xshipping_methods['name'.$i],
+						'title'        => $quote_title,
 						'cost'         => $shipping_cost,
 						'tax_class_id' => $shipping_xshipping_methods['tax_class_id'.$i],
 						'sort_order'   => intval($shipping_xshipping_methods['sort_order'.$i]),

@@ -24,7 +24,12 @@ function getURLVar(key) {
 
 $(document).ready(function() {	
 	
-	
+	$(document).on('change', '#input-payment-country', function(){
+		$('#input-payment-zone, #input-shipping-zone').change();	
+	})
+	$(document).on('change', '#input-shipping-country', function(){
+		$('#input-payment-zone, #input-shipping-zone').change();	
+	})
 	
 
 	
@@ -32,7 +37,7 @@ $(document).ready(function() {
 		
 		console.log('#input-shipping-zone changed');
 		
-		if(!$(this).val()){
+		/*if(!$(this).val()){
 			setTimeout(function(){
 				
 				$('#input-shipping-zone').change();
@@ -40,7 +45,7 @@ $(document).ready(function() {
 				
 			}, 1000);
 			return false;
-		}
+		}*/
 		if($('#input-shipping-country').val() == 109)
 		{
 			$('#shipping-city-selector').html('');
@@ -106,6 +111,7 @@ $(document).ready(function() {
 		}*/
 		if($('#input-payment-country').val() == 109)
 		{
+			$("#city-tooltip").css('display' , 'none');
 			$('#payment-city-selector').html('');
 			$('#payment-city-selector').html('<select name="city"  id="input-payment-city" class="form-control"><option>Нет данных</option></select>');
 			console.log('Kazakhstan');
@@ -149,8 +155,14 @@ $(document).ready(function() {
 			
 		} else {
 			$('#payment-city-selector').html('');
-			$('#payment-city-selector').html('<input type="text" name="city" value="" placeholder="{{ entry_city }}" id="input-payment-city" class="form-control" />');
-		}
+			$('#payment-city-selector').html('<input type="text" name="city" value="" placeholder="Введите город" id="input-payment-city" class="form-control" />');
+
+			if ( ($('#input-payment-country').val() == 176) || ($('#input-payment-country').val() == 20) || ($('#input-payment-country').val() == 11) || ($('#input-payment-country').val() == 115) ) {
+				$("#city-tooltip").css('display' , 'inline');
+			} else {
+				$("#city-tooltip").css('display' , 'none');
+			}
+		} 
 		
 	});
 	
